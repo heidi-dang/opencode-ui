@@ -8,7 +8,9 @@ import {
   XCircle,
   GitBranch,
 } from 'lucide-react';
-import { DemoSession, SessionStatus } from '../types/ui';
+import type { DemoSession, SessionStatus } from '../types/ui';
+import { SESSION_STATUS_VISUALS } from '../contracts/presentation';
+import { Badge } from './ui';
 
 interface SessionListProps {
   sessions: DemoSession[];
@@ -18,37 +20,27 @@ interface SessionListProps {
 
 const statusBadgeMap: Record<
   SessionStatus,
-  { label: string; bg: string; text: string; icon: React.ReactNode }
+  { variant: 'success' | 'warning' | 'danger' | 'info' | 'default'; icon: React.ReactNode }
 > = {
   idle: {
-    label: 'Idle',
-    bg: 'bg-emerald-500/10 border-emerald-500/20',
-    text: 'text-emerald-400',
-    icon: <CheckCircle2 className="w-3 h-3 text-emerald-400" />,
+    variant: 'success',
+    icon: <CheckCircle2 className="w-3 h-3" />,
   },
   busy: {
-    label: 'Busy',
-    bg: 'bg-amber-500/10 border-amber-500/20',
-    text: 'text-amber-400',
-    icon: <Loader2 className="w-3 h-3 text-amber-400 animate-spin" />,
+    variant: 'warning',
+    icon: <Loader2 className="w-3 h-3 animate-spin" />,
   },
   retrying: {
-    label: 'Retrying',
-    bg: 'bg-blue-500/10 border-blue-500/20',
-    text: 'text-blue-400',
-    icon: <Loader2 className="w-3 h-3 text-blue-400 animate-spin" />,
+    variant: 'info',
+    icon: <Loader2 className="w-3 h-3 animate-spin" />,
   },
   attention: {
-    label: 'Attention',
-    bg: 'bg-orange-500/10 border-orange-500/20',
-    text: 'text-orange-400',
-    icon: <AlertTriangle className="w-3 h-3 text-orange-400" />,
+    variant: 'warning',
+    icon: <AlertTriangle className="w-3 h-3" />,
   },
   error: {
-    label: 'Error',
-    bg: 'bg-red-500/10 border-red-500/20',
-    text: 'text-red-400',
-    icon: <XCircle className="w-3 h-3 text-red-400" />,
+    variant: 'danger',
+    icon: <XCircle className="w-3 h-3" />,
   },
 };
 
@@ -88,12 +80,10 @@ export const SessionList: React.FC<SessionListProps> = ({
               <h4 className="text-xs font-semibold line-clamp-1 flex-1 leading-snug">
                 {session.title}
               </h4>
-              <span
-                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border ${statusMeta.bg} ${statusMeta.text}`}
-              >
+              <Badge variant={statusMeta.variant}>
                 {statusMeta.icon}
-                {statusMeta.label}
-              </span>
+                {SESSION_STATUS_VISUALS[session.status].label}
+              </Badge>
             </div>
 
             <p className="text-[11px] text-slate-400 line-clamp-1 mb-2">

@@ -12,18 +12,20 @@ import {
   Circle,
 } from 'lucide-react';
 import { useUiStore } from '../store/useUiStore';
-import { ContextSection } from '../types/ui';
+import type { ContextSection } from '../contracts/presentation';
 import {
   DEMO_REFERENCED_FILES,
   DEMO_MODIFIED_FILES,
   DEMO_WORKSPACE_FILES,
   DEMO_TODOS,
 } from '../mocks/frontendDemoData';
+import { Tabs, Panel, Badge } from './ui';
+import type { TabItem } from './ui';
 
 export const ContextPanel: React.FC = () => {
   const { activeContextSection, setActiveContextSection } = useUiStore();
 
-  const sections: { id: ContextSection; label: string; icon: React.ReactNode; count: number }[] = [
+  const sections: TabItem<ContextSection>[] = [
     {
       id: 'referenced',
       label: 'Referenced',
@@ -33,57 +35,31 @@ export const ContextPanel: React.FC = () => {
     {
       id: 'modified',
       label: 'Modified',
-      icon: <FileCode className="w-3.5 h-3.5 text-amber-500" />,
+      icon: <FileCode className="w-3.5 h-3.5" />,
       count: DEMO_MODIFIED_FILES.length,
     },
     {
       id: 'workspace',
       label: 'Workspace',
-      icon: <FolderTree className="w-3.5 h-3.5 text-blue-400" />,
+      icon: <FolderTree className="w-3.5 h-3.5" />,
       count: DEMO_WORKSPACE_FILES.length,
     },
     {
       id: 'todos',
       label: 'Todos',
-      icon: <CheckSquare className="w-3.5 h-3.5 text-emerald-400" />,
+      icon: <CheckSquare className="w-3.5 h-3.5" />,
       count: DEMO_TODOS.length,
     },
   ];
 
   return (
-    <aside className="h-full flex flex-col bg-slate-950 text-slate-200 border-l border-slate-800/80 w-full select-none">
-      {/* Required Title */}
-      <div className="p-3 border-b border-slate-800/80 flex items-center justify-between">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
-          Workspace & Context
-        </h3>
-        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
-          Phase 1A
-        </span>
-      </div>
-
-      {/* Section Tabs */}
-      <div className="p-2 bg-slate-900/60 border-b border-slate-800/80 grid grid-cols-2 gap-1 sm:grid-cols-4">
-        {sections.map((sec) => {
-          const isActive = activeContextSection === sec.id;
-          return (
-            <button
-              key={sec.id}
-              type="button"
-              onClick={() => setActiveContextSection(sec.id)}
-              className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium transition-all focus-ring ${
-                isActive
-                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-              }`}
-            >
-              {sec.icon}
-              <span className="truncate">{sec.label}</span>
-              <span className="text-[10px] font-mono text-slate-500">({sec.count})</span>
-            </button>
-          );
-        })}
-      </div>
+    <Panel
+      title="Workspace & Context"
+      badge={<Badge>Phase 1A</Badge>}
+      footer="Note: Workspace panel displays frontend demo representation."
+      bodyClassName="p-3"
+    >
+      <Tabs items={sections} activeId={activeContextSection} onChange={setActiveContextSection} />
 
       {/* Main Tab Content */}
       <div className="flex-1 overflow-y-auto p-3">
@@ -223,11 +199,6 @@ export const ContextPanel: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Footer Disclaimer */}
-      <div className="p-2.5 border-t border-slate-800/80 bg-slate-900/40 text-[10px] text-slate-400 text-center">
-        Note: Workspace panel displays frontend demo representation.
-      </div>
-    </aside>
+    </Panel>
   );
 };

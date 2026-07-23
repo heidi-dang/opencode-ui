@@ -3,6 +3,7 @@ import { Plus, SlidersHorizontal, Layers } from 'lucide-react';
 import { SessionSearch } from './SessionSearch';
 import { SessionList } from './SessionList';
 import { DEMO_SESSIONS } from '../mocks/frontendDemoData';
+import { Badge } from './ui';
 
 export const SessionsPanel: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,9 +31,7 @@ export const SessionsPanel: React.FC = () => {
               Sessions
             </h3>
           </div>
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
-            {filteredSessions.length} total
-          </span>
+          <Badge>{filteredSessions.length} total</Badge>
         </div>
 
         {/* New Session Button (Disabled with clear explanation) */}
@@ -59,7 +58,7 @@ export const SessionsPanel: React.FC = () => {
         />
       </div>
 
-      {/* Panel Footer */}
+      {/* Demo Mode Footer */}
       <div className="p-2.5 border-t border-slate-800/80 bg-slate-900/40 text-[10px] text-slate-400 flex items-center justify-between">
         <span className="flex items-center gap-1 font-mono">
           <SlidersHorizontal className="w-3 h-3 text-slate-400" />

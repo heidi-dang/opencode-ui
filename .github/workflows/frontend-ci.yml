@@ -31,5 +31,8 @@ jobs:
       - name: Test
         run: npm run test:run
 
+      - name: Boundary check (forbidden backend integrations)
+        run: npm run check:boundaries
+
       - name: Build
         run: npm run build
