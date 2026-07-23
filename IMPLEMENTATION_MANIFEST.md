@@ -9,10 +9,11 @@
 - **Slice**: 1D — Accessibility Pass, Visual QA, and Layout Stress Testing (baseline)
 - **Slice**: 1E — Readiness Audit and Gateway Integration Contract Prep (baseline)
 - **Slice**: 2A — Gateway Scaffold and Contract Tests (baseline)
-- **Slice**: 2B — Gateway OpenCode SDK Adapter Spike Behind Disabled Flag (current)
-- **Status**: Phase 2B implemented
+- **Slice**: 2B — Gateway OpenCode SDK Adapter Spike Behind Disabled Flag (baseline)
+- **Slice**: 2C — Gateway Runtime Config, Safe Startup, and Adapter Health (current)
+- **Status**: Phase 2C implemented
 - **Baseline commit**: `b2a1106be0fcc751e9e886835f8e7bbe0f962bdb` (Phase 1A)
-- **Current branch**: `feat/phase-2b-sdk-adapter-disabled`
+- **Current branch**: `feat/phase-2c-gateway-runtime-config`
 
 ---
 
@@ -403,6 +404,87 @@
 
 ---
 
+### Phase 2C (current additions)
+1. **Zod-Validated Runtime Configuration**:
+   - Full Zod schema (`GatewayEnvSchema`) for all gateway environment variables.
+   - `parseConfig(env)` function returning typed `GatewayRuntimeConfig`.
+   - `computeMode(config)` returning `safe-disabled`, `configured-not-connected`, or `configuration-error`.
+   - URL validation (HTTP/HTTPS only, no embedded credentials).
+   - Port validation (integer 1–65535).
+   - Host validation (no schemes, no paths).
+   - NODE_ENV validation (development/test/production only).
+   - Log level validation (silent/error/warn/info/debug).
+2. **Safe Startup Behaviour**:
+   - Gateway starts with default `.env.example` configuration.
+   - No SDK client instantiation.
+   - No OpenCode health request.
+   - Typed startup errors via `ConfigValidationError`.
+   - `buildServer()` does not call `process.exit()`.
+3. **Runtime Endpoints**:
+   - `GET /runtime/config` — Returns sanitized config (no raw env values).
+   - `GET /runtime/adapter-health` — Returns adapter health (disabled or configured-not-connected).
+4. **Shared Runtime Contracts** (`packages/contracts/src/gateway.ts`):
+   - `GatewayRuntimeConfigViewSchema` / `GatewayRuntimeConfigView`.
+   - `GatewayAdapterHealthViewSchema` / `GatewayAdapterHealthView`.
+   - `GatewayRunModeSchema` / `GatewayRunMode`.
+5. **Safe Logging and Redaction**:
+   - No full environment dump.
+   - No raw `OPENCODE_SERVER_URL` in API responses.
+   - No `OPENCODE_DEFAULT_MODEL` value in API responses.
+   - No credential values in validation errors.
+6. **Expanded Test Suite**:
+   - 284 total tests (186 frontend + 79 gateway + 19 contracts).
+   - 37 new gateway tests: config parsing (22), runtime routes (13).
+   - 8 new contracts tests: runtime schemas (4), adapter health (4).
+
+---
+
+## Files Changed (Phase 2C)
+
+### Files Created
+- `apps/gateway/src/routes/runtime.ts` — Runtime config and adapter-health endpoints
+- `apps/gateway/src/runtime/runtimeConfig.ts` — Runtime config canonical import layer
+- `apps/gateway/src/runtime/runtimeErrors.ts` — `ConfigValidationError` typed error
+- `apps/gateway/src/runtime/runtimeStatus.ts` — Mode computation re-exports
+- `apps/gateway/src/tests/runtime-config.test.ts` — 22 config parsing tests
+- `apps/gateway/src/tests/runtime-routes.test.ts` — 13 runtime route tests
+- `docs/gateway/phase-2c-runtime-config-and-health.md` — Phase 2C documentation
+
+### Files Modified
+- `apps/gateway/src/config.ts` — Zod-validated config with schemas and parser
+- `apps/gateway/src/server.ts` — Accepts `GatewayRuntimeConfig`, decorates `runtimeConfig`
+- `apps/gateway/src/index.ts` — Uses `parseConfig()` with error handling
+- `apps/gateway/src/routes/health.ts` — Uses decorated config for mode
+- `apps/gateway/.env.example` — All Phase 2C variables documented
+- `apps/gateway/src/tests/config.test.ts` — Updated for new config shape
+- `apps/gateway/src/tests/health.test.ts` — Updated for decorated config
+- `apps/gateway/src/tests/contract.test.ts` — Updated test app setup
+- `apps/gateway/src/tests/sdk-adapter.test.ts` — Updated config property access
+- `packages/contracts/src/gateway.ts` — Added runtime and adapter health schemas
+- `packages/contracts/src/tests/gateway-schemas.test.ts` — Added 8 runtime schema tests
+- `IMPLEMENTATION_MANIFEST.md` — Updated with Phase 2C information
+
+### Files Deleted
+- None
+
+---
+
+## Validation Results (Phase 2C)
+
+| Command | Result |
+|---|---|
+| `npm run check:boundaries` (frontend + gateway) | PASS |
+| `npm run lint` (frontend) | PASS |
+| `npm run typecheck` (frontend) | PASS |
+| `npm run test:run` (frontend) | PASS (186/186 tests) |
+| `npm run build` (frontend) | PASS |
+| `npm run check --prefix apps/gateway` (typecheck + 79 tests + build) | PASS |
+| `npm run check --prefix packages/contracts` (typecheck + 19 tests) | PASS |
+| Disabled-mode local smoke | PASS (4/4 endpoints) |
+| Configured-not-connected local smoke | PASS (2/2 endpoints) |
+
+---
+
 ## Files Changed (Phase 2A)
 
 ### Files Created
@@ -466,9 +548,9 @@
 - **Contracts job**: `npm ci --prefix packages/contracts` → `typecheck` → `test:run`
 
 ## Deferred Functionality (not yet implemented)
-- Live OpenCode SDK client connection (Phase 2C+)
-- SSE/EventSource stream to browser (Phase 2C+)
-- WebSocket for real-time updates (Phase 2C+)
+- Live OpenCode SDK client connection (Phase 2D+)
+- SSE/EventSource stream to browser (Phase 2D+)
+- WebSocket for real-time updates (Phase 2D+)
 - `prompt_async` correlation (Phase 3+)
 - Permission prompt execution (Phase 3+)
 - Preview runtime management (Phase 3+)
@@ -480,9 +562,9 @@
 ---
 
 ## Known Issues
-- None identified in Phase 2B. Phase 2B adds a disabled SDK adapter only — no live connection exists.
+- None identified in Phase 2C. Runtime config is validated and safe-disabled by default.
 
 ## Next Bounded Slice
-**Phase 2C — Gateway Runtime Config, Safe Startup, and Adapter Health**
+**Phase 2D — Gateway OpenCode SDK Adapter Wiring and SSE Contract**
 
-Do not start Phase 2C. Complete and merge Phase 2B first.
+Do not start Phase 2D. Complete and merge Phase 2C first.

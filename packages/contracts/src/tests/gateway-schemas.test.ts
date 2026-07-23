@@ -7,6 +7,8 @@ import {
   GatewayWorkspaceRegistryViewSchema,
   GatewayStatusViewSchema,
   GatewayConnectionViewSchema,
+  GatewayRuntimeConfigViewSchema,
+  GatewayAdapterHealthViewSchema,
 } from '../gateway.js';
 
 describe('GatewaySessionViewSchema', () => {
@@ -134,5 +136,106 @@ describe('GatewayConnectionViewSchema', () => {
     for (const state of validStates) {
       expect(GatewayConnectionViewSchema.parse(state)).toBe(state);
     }
+  });
+});
+
+describe('GatewayRuntimeConfigViewSchema', () => {
+  it('accepts safe-disabled config', () => {
+    const result = GatewayRuntimeConfigViewSchema.parse({
+      nodeEnv: 'development',
+      sdkEnabled: false,
+      serverConfigured: false,
+      modelConfigured: false,
+      mode: 'safe-disabled',
+    });
+    expect(result.mode).toBe('safe-disabled');
+  });
+
+  it('accepts configured-not-connected config', () => {
+    const result = GatewayRuntimeConfigViewSchema.parse({
+      nodeEnv: 'production',
+      sdkEnabled: true,
+      serverConfigured: true,
+      modelConfigured: true,
+      mode: 'configured-not-connected',
+    });
+    expect(result.sdkEnabled).toBe(true);
+  });
+
+  it('rejects invalid mode', () => {
+    expect(() =>
+      GatewayRuntimeConfigViewSchema.parse({
+        nodeEnv: 'development',
+        sdkEnabled: false,
+        serverConfigured: false,
+        modelConfigured: false,
+        mode: 'invalid',
+      }),
+    ).toThrow();
+  });
+
+  it('rejects invalid nodeEnv', () => {
+    expect(() =>
+      GatewayRuntimeConfigViewSchema.parse({
+        nodeEnv: 'staging',
+        sdkEnabled: false,
+        serverConfigured: false,
+        modelConfigured: false,
+        mode: 'safe-disabled',
+      }),
+    ).toThrow();
+  });
+});
+
+describe('GatewayAdapterHealthViewSchema', () => {
+  it('accepts disabled health', () => {
+    const result = GatewayAdapterHealthViewSchema.parse({
+      ok: true,
+      adapter: 'disabled',
+      connection: 'not-enabled',
+      sdkInstalled: false,
+      liveRequestsEnabled: false,
+      message: 'OpenCode SDK integration is disabled.',
+    });
+    expect(result.adapter).toBe('disabled');
+    expect(result.sdkInstalled).toBe(false);
+  });
+
+  it('accepts configured health', () => {
+    const result = GatewayAdapterHealthViewSchema.parse({
+      ok: true,
+      adapter: 'configured',
+      connection: 'not-connected',
+      sdkInstalled: false,
+      liveRequestsEnabled: false,
+      message: 'OpenCode configuration is valid.',
+    });
+    expect(result.adapter).toBe('configured');
+  });
+
+  it('rejects sdkInstalled=true', () => {
+    expect(() =>
+      GatewayAdapterHealthViewSchema.parse({
+        ok: true,
+        adapter: 'disabled',
+        connection: 'not-enabled',
+        sdkInstalled: true,
+        liveRequestsEnabled: false,
+        message: 'test',
+      }),
+    ).toThrow();
+  });
+
+  it('rejects invalid connection state', () => {
+    expect(() =>
+      GatewayAdapterHealthViewSchema.parse({
+        ok: true,
+        adapter: 'disabled',
+        connection: 'connected',
+        sdkInstalled: false,
+        liveRequestsEnabled: false,
+        message: 'test',
+      }),
+    ).toThrow();
   });
 });

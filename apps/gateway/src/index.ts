@@ -1,13 +1,24 @@
-import { loadConfig } from './config.js';
+import { parseConfig, ConfigValidationError } from './config.js';
 import { buildServer } from './server.js';
 
 async function main() {
-  const config = loadConfig();
+  let config;
+  try {
+    config = parseConfig();
+  } catch (err) {
+    if (err instanceof ConfigValidationError) {
+      console.error('Configuration validation failed:', err.message);
+    } else {
+      console.error('Unexpected error during configuration:', err);
+    }
+    process.exit(1);
+  }
+
   const app = buildServer(config);
 
   try {
-    await app.listen({ host: config.GATEWAY_HOST, port: config.GATEWAY_PORT });
-    console.log(`Gateway listening on ${config.GATEWAY_HOST}:${config.GATEWAY_PORT}`);
+    await app.listen({ host: config.host, port: config.port });
+    console.log(`Gateway listening on ${config.host}:${config.port}`);
   } catch (err) {
     console.error('Failed to start gateway:', err);
     process.exit(1);
