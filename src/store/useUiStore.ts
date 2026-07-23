@@ -9,6 +9,7 @@ export interface UiState {
   mobileNavigationOpen: boolean;
   mobileContextOpen: boolean;
   activeContextSection: ContextSection;
+  commandPaletteOpen: boolean;
   setAppearance: (mode: AppearanceMode) => void;
   toggleLeftPanel: () => void;
   toggleRightPanel: () => void;
@@ -16,6 +17,8 @@ export interface UiState {
   setMobileContextOpen: (open: boolean) => void;
   setActiveContextSection: (section: ContextSection) => void;
   resetLayout: () => void;
+  setCommandPaletteOpen: (open: boolean) => void;
+  toggleCommandPalette: () => void;
 }
 
 export const useUiStore = create<UiState>()(
@@ -27,6 +30,7 @@ export const useUiStore = create<UiState>()(
       mobileNavigationOpen: false,
       mobileContextOpen: false,
       activeContextSection: 'workspace',
+      commandPaletteOpen: false,
 
       setAppearance: (appearance: AppearanceMode) => {
         set({ appearance });
@@ -42,6 +46,10 @@ export const useUiStore = create<UiState>()(
       setMobileContextOpen: (mobileContextOpen: boolean) => set({ mobileContextOpen }),
 
       setActiveContextSection: (activeContextSection: ContextSection) => set({ activeContextSection }),
+
+      setCommandPaletteOpen: (commandPaletteOpen: boolean) => set({ commandPaletteOpen }),
+
+      toggleCommandPalette: () => set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen })),
 
       resetLayout: () =>
         set({

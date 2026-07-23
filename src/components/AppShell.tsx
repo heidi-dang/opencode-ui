@@ -3,6 +3,7 @@ import { TopToolbar } from './TopToolbar';
 import { SessionsPanel } from './SessionsPanel';
 import { ContextPanel } from './ContextPanel';
 import { ResponsiveDrawer } from './ResponsiveDrawer';
+import { CommandPalette, useCommandPaletteShortcut } from './CommandPalette';
 import { useUiStore, applyAppearanceMode } from '../store/useUiStore';
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -20,6 +21,9 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
     setMobileNavigationOpen,
     setMobileContextOpen,
   } = useUiStore();
+
+  // Register Cmd/Ctrl+K and Escape for command palette
+  useCommandPaletteShortcut();
 
   useEffect(() => {
     applyAppearanceMode(appearance);
@@ -77,6 +81,9 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       >
         <ContextPanel />
       </ResponsiveDrawer>
+
+      {/* Command Palette (global overlay) */}
+      <CommandPalette />
     </div>
   );
 };

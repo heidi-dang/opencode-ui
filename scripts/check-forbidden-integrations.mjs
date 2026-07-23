@@ -21,6 +21,13 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const SRC = join(ROOT, 'src');
 
+// Additional config / source files to scan beyond src/
+const CONFIG_FILES = [
+  'package.json',
+  'vite.config.ts',
+  'eslint.config.js',
+].map((f) => join(ROOT, f));
+
 // ── Forbidden patterns ─────────────────────────────────────────────
 // Anything in this list that appears as an import, require, or
 // top-level reference in src/ will fail the check.
@@ -44,9 +51,11 @@ const FORBIDDEN_IMPORTS = [
 
   // Pty / terminals
   'node-pty',
+  'pty',
   'xterm',
   '@xterm/xterm',
   'node:child_process',
+  'child_process',
 
   // SDK / API clients
   '@google-genai',
@@ -54,6 +63,9 @@ const FORBIDDEN_IMPORTS = [
   'openai',
   'anthropic',
   '@opencode/sdk',
+  '@opencode-ai/sdk',
+  'createOpencode',
+  'createOpencodeClient',
 
   // Backend database / ORM
   'prisma',
@@ -71,9 +83,54 @@ const FORBIDDEN_IMPORTS = [
   'clerk',
   '@supabase/supabase-js',
 
-  // Server-Sent Events (Phase 1C)
+  // Server-Sent Events / realtime
   'eventsource',
   'event-source-polyfill',
+  'EventSource',
+
+  // WebSocket / realtime
+  'new WebSocket',
+
+  // OpenCode API
+  'prompt_async',
+  '/api/opencode',
+
+  // Network addresses (runtime code only)
+  'localhost:',
+  '127.0.0.1:',
+
+  // Environment variables (source code only)
+  'GEMINI_API_KEY',
+];
+
+// ── Patterns that require an import/require context ──────────────────
+
+const IMPORT_PATTERNS = [
+  'fastify', 'express', 'koa', 'hapi',
+  'node:http', 'node:https', 'node:net', 'node:ws',
+  'ws', 'socket.io', 'socket.io-client',
+  '@webcontainer/api',
+  'node-pty', 'xterm', '@xterm/xterm', 'node:child_process',
+  '@google-genai', '@google/generative-ai', 'openai', 'anthropic',
+  '@opencode/sdk', '@opencode-ai/sdk',
+  'prisma', '@prisma/client', 'drizzle-orm',
+  'better-sqlite3', 'sql.js', 'sqlite3',
+  'next-auth', 'passport', 'auth0', 'clerk', '@supabase/supabase-js',
+  'eventsource', 'event-source-polyfill',
+];
+
+// ── Patterns that are literal strings in source code ─────────────────
+// These patterns require word boundaries to avoid false positives from
+// comments describing deferred functionality.
+
+const LITERAL_PATTERNS = [
+  { pattern: 'createOpencode', wordBoundary: true },
+  { pattern: 'createOpencodeClient', wordBoundary: true },
+  { pattern: 'prompt_async', wordBoundary: true },
+  { pattern: '/api/opencode', wordBoundary: false },
+  { pattern: 'GEMINI_API_KEY', wordBoundary: true },
+  { pattern: 'localhost:', wordBoundary: false },
+  { pattern: '127.0.0.1:', wordBoundary: false },
 ];
 
 // ── Scan logic ──────────────────────────────────────────────────────
@@ -120,13 +177,16 @@ function collectFiles(dir) {
 }
 
 const srcFiles = collectFiles(SRC);
+const allFiles = [...srcFiles, ...CONFIG_FILES.filter((f) => {
+  try { statSync(f); return true; } catch { return false; }
+})];
 
-for (const file of srcFiles) {
+for (const file of allFiles) {
   const content = readFileSync(file, 'utf-8');
   const relativePath = file.replace(ROOT, '').replace(/^\//, '');
 
-  for (const forbidden of FORBIDDEN_IMPORTS) {
-    // Check import/require statements and dynamic imports
+  // 1. Check import/require patterns
+  for (const forbidden of IMPORT_PATTERNS) {
     const importRegex = new RegExp(
       `(from\\s+['"\`]${escapeRegex(forbidden)}|require\\(['"\`]${escapeRegex(forbidden)}|import\\(['"\`]${escapeRegex(forbidden)})`,
       'i',
@@ -136,8 +196,34 @@ for (const file of srcFiles) {
       issues.push({
         file: relativePath,
         forbidden,
-        detail: `Import/require of "${forbidden}" detected. Phase 1A/1B must remain frontend-only.`,
+        detail: `Import/require of "${forbidden}" detected. Frontend source must not import backend packages.`,
       });
+    }
+  }
+
+  // 2. Check literal patterns in source files only (skip lockfiles/docs)
+  if (
+    file.endsWith('.ts') || file.endsWith('.tsx') || file.endsWith('.js') ||
+    file.endsWith('.jsx') || file.endsWith('.mjs') || file.endsWith('.cjs') ||
+    file.endsWith('.json')
+  ) {
+    // Skip files that deliberately check for these patterns (boundary tests)
+    if (file.includes('boundaries.test.ts') || file.includes('boundary-contract.test.ts')) continue;
+    if (file.endsWith('check-forbidden-integrations.mjs')) continue;
+
+    for (const { pattern, wordBoundary } of LITERAL_PATTERNS) {
+      const escaped = escapeRegex(pattern);
+      const regex = wordBoundary
+        ? new RegExp(`\\b${escaped}\\b`, 'i')
+        : new RegExp(escaped, 'i');
+
+      if (regex.test(content)) {
+        issues.push({
+          file: relativePath,
+          forbidden: pattern,
+          detail: `Literal string "${pattern}" found in source code. Backend/network references not allowed in Phase 1C.`,
+        });
+      }
     }
   }
 }

@@ -16,6 +16,8 @@ import {
   Menu,
   SlidersHorizontal,
   ChevronDown,
+  Command,
+  Search,
 } from 'lucide-react';
 import { useUiStore } from '../store/useUiStore';
 import { PrimaryNavigation } from './PrimaryNavigation';
@@ -37,6 +39,7 @@ export const TopToolbar: React.FC = () => {
     toggleRightPanel,
     setMobileNavigationOpen,
     setMobileContextOpen,
+    setCommandPaletteOpen,
   } = useUiStore();
 
   const [selectedWorkspace, setSelectedWorkspace] = useState(DEMO_WORKSPACES[0].id);
@@ -290,6 +293,20 @@ export const TopToolbar: React.FC = () => {
 
         {/* Right Section: Connection, Theme, Panel Controls */}
         <div className="flex items-center gap-2">
+          {/* Command Palette Button */}
+          <button
+            onClick={() => setCommandPaletteOpen(true)}
+            type="button"
+            className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors focus-ring text-xs"
+            aria-label="Open command palette"
+            title="Open command palette (Cmd+K)"
+          >
+            <Search className="w-3.5 h-3.5" />
+            <kbd className="text-[9px] font-mono px-1 py-0.5 rounded bg-slate-800/80 border border-slate-700 text-slate-500 hidden md:inline-flex items-center gap-0.5">
+              <Command className="w-2.5 h-2.5" />K
+            </kbd>
+          </button>
+
           {/* Connection Status Badge */}
           <div
             className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-mono"
