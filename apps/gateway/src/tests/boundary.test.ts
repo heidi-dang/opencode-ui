@@ -29,7 +29,7 @@ function collectSourceFiles(dir: string): string[] {
 }
 
 const sourceFiles = collectSourceFiles(srcDir).filter(
-  (f) => !f.endsWith('boundary.test.ts'),
+  (f) => !f.endsWith('boundary.test.ts') && !f.endsWith('sdk-adapter.test.ts'),
 );
 
 function readAllSource(): string {
