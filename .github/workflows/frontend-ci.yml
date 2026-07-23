@@ -47,6 +47,9 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Install contracts dependencies
+        run: npm ci --prefix packages/contracts
+
       - name: Install gateway dependencies
         run: npm ci --prefix apps/gateway
 
