@@ -2,7 +2,7 @@
 
 **Frontend web client foundation for the OpenCode headless AI development platform.**
 
-Current phase: **Phase 1A — Frontend Shell**
+Current phase: **Phase 1C — Command Palette, Session UX, and Keyboard Interactions**
 
 ## Implemented Routes
 
@@ -59,7 +59,7 @@ opencode-ui/
 
 ## Deferred Functionality
 
-The following features are **not implemented** in Phase 1A:
+The following features are **not implemented** in Phase 1A, 1B, or 1C:
 
 - Fastify/Express gateway integration
 - OpenCode SDK and SSE event streaming

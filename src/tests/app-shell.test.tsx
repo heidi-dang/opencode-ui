@@ -125,7 +125,7 @@ describe('Context tabs', () => {
 
     // Click on Referenced tab
     await userEvent.click(referencedBtn!);
-    expect(screen.getByText(/Files explicitly attached/i)).toBeInTheDocument();
+    expect(screen.getByText(/Files attached to prompt context/i)).toBeInTheDocument();
 
     // Click on Todos tab
     await userEvent.click(todosBtn!);
@@ -198,6 +198,22 @@ describe('Selector dropdowns', () => {
 
     expect(fetchSpy).not.toHaveBeenCalled();
     fetchSpy.mockRestore();
+  });
+});
+
+describe('Command palette button', () => {
+  it('renders in the toolbar with keyboard hint', () => {
+    renderApp('/builder');
+    const btn = screen.getByRole('button', { name: /Open command palette/i });
+    expect(btn).toBeInTheDocument();
+    expect(btn).toHaveAttribute('title', expect.stringContaining('Cmd+K'));
+  });
+
+  it('opens the command palette when clicked', async () => {
+    renderApp('/builder');
+    const btn = screen.getByRole('button', { name: /Open command palette/i });
+    await userEvent.click(btn);
+    expect(screen.getByRole('dialog', { name: /command palette/i })).toBeInTheDocument();
   });
 });
 

@@ -4,10 +4,11 @@
 - **Project**: OpenCode Web UI
 - **Phase**: 1
 - **Slice**: 1A — Production Shell and Interaction Foundation (baseline)
-- **Slice**: 1B — Design-System Hardening and Frontend Contract Boundaries (current)
-- **Status**: Verified baseline; Phase 1B implemented
+- **Slice**: 1B — Design-System Hardening and Frontend Contract Boundaries (baseline)
+- **Slice**: 1C — Command Palette, Session UX, and Keyboard Interactions (current)
+- **Status**: Phase 1C implemented
 - **Baseline commit**: `b2a1106be0fcc751e9e886835f8e7bbe0f962bdb` (Phase 1A)
-- **Current branch**: `feat/frontend-phase-1b-design-system`
+- **Current branch**: `feat/frontend-phase-1c-interactions`
 
 ---
 
@@ -34,7 +35,7 @@
 5. **Accessibility**:
    - Keyboard focus rings, semantic HTML landmarks, accessible mobile drawers.
 
-### Phase 1B (current additions)
+### Phase 1B (baseline, retained)
 1. **Frontend Presentation Contracts** (`src/contracts/presentation.ts`):
    - `SESSION_STATUS_VISUALS` — typed visual mappings for session status badges.
    - `CONNECTION_STATE_VISUALS` — typed visual mappings for connection indicator.
@@ -66,51 +67,86 @@
    - 55 total tests (17 Phase 1A + 38 new Phase 1B).
    - Tests for UI primitives, contracts layer, and boundary enforcement.
 
+### Phase 1C (current additions)
+1. **Command Palette** (`src/components/CommandPalette.tsx`):
+   - Accessible dialog with `role="dialog"`, `aria-modal`, and keyboard focus trap/restore.
+   - Searchable command list (12 commands across navigation, panel, appearance, context categories).
+   - Keyboard navigation: ArrowUp/Down, Enter, Escape.
+   - Backdrop click to close, focus restoration on close.
+   - `useCommandPaletteShortcut()` hook bound to `Cmd/Ctrl+K` and Escape.
+2. **Keyboard Shortcut Hook** (`src/hooks/useKeyboardShortcut.ts`):
+   - Generic hook supporting `meta`, `ctrl`, `shift`, `alt` modifiers.
+   - Input-avoidance by default (configurable via `allowInInputs`).
+   - `preventDefault` support and automatic cleanup on unmount.
+3. **Session UX Improvements** (`src/components/SessionsPanel.tsx`):
+   - Status filter chips (All / Idle / Busy / Attention / Error / Retrying) with count badges.
+   - Sort controls: Recent, Status, Name with status-based priority `[attention, error, busy, retrying, idle]`.
+   - Clear filters button that resets all active filters and sort.
+   - `timeAgoValue()` heuristic for recency sorting of "time ago" strings.
+4. **Session List Keyboard Navigation** (`src/components/SessionList.tsx`):
+   - ArrowUp/ArrowDown to navigate sessions with wrapping.
+   - `tabIndex={0}` on active session, `tabIndex={-1}` on others.
+   - `scrollIntoView` on active session change (with jsdom-safe guard).
+5. **Toolbar Integration**:
+   - Command palette trigger button with search icon and `⌘K` keyboard hint in TopToolbar.
+   - `useCommandPaletteShortcut()` called in AppShell.
+6. **Store Updates** (`src/store/useUiStore.ts`):
+   - `commandPaletteOpen`, `setCommandPaletteOpen()`, `toggleCommandPalette()`.
+   - Not persisted to localStorage (ephemeral UI state).
+7. **Context Panel Polish** (`src/components/ContextPanel.tsx`):
+   - Updated section descriptions and footer wording for clarity.
+8. **Boundary Guard Expansion** (`scripts/check-forbidden-integrations.mjs`):
+   - Split patterns into `IMPORT_PATTERNS` and `LITERAL_PATTERNS`.
+   - Added `child_process`, `pty`, `createOpencode`, `createOpencodeClient`, `GEMINI_API_KEY`, etc.
+   - Scans config files (`package.json`, `vite.config.ts`, `eslint.config.js`) in addition to `src/`.
+   - Uses word-boundary matching for short patterns.
+9. **Expanded Test Suite**:
+   - 102 total tests (55 Phase 1A/1B + 47 new Phase 1C).
+   - `keyboard-shortcut.test.tsx` — 7 tests for `useKeyboardShortcut` hook.
+   - `ui-store.test.ts` — 11 tests for Zustand store actions.
+   - `command-palette.test.tsx` — 10 tests for CommandPalette rendering and interaction.
+   - `session-ux.test.tsx` — 18 tests for SessionsPanel filters/sort and SessionList keyboard nav.
+   - `app-shell.test.tsx` — 2 new tests for toolbar command palette button.
+
 ---
 
-## Files Changed (Phase 1B)
+## Files Changed (Phase 1C)
 
 ### Files Created
-- `.github/workflows/frontend-ci.yml` — Added boundary check step
-- `src/contracts/presentation.ts` — Frontend-only presentation contracts
-- `src/components/ui/Button.tsx` — Button primitive
-- `src/components/ui/Badge.tsx` — Badge primitive
-- `src/components/ui/Panel.tsx` — Panel layout primitive
-- `src/components/ui/Tabs.tsx` — Accessible tabs primitive
-- `src/components/ui/StateBlock.tsx` — State indicator primitive
-- `src/components/ui/CodeBlock.tsx` — Code display primitive
-- `src/components/ui/KeyShortcut.tsx` — Keyboard shortcut primitive
-- `src/components/ui/SectionHeader.tsx` — Section header primitive
-- `src/components/ui/SegmentedControl.tsx` — Segmented control primitive
-- `src/components/ui/index.ts` — UI primitives barrel export
-- `scripts/check-forbidden-integrations.mjs` — Boundary guard script
-- `src/tests/contracts.test.ts` — 12 contract unit tests
-- `src/tests/primitives.test.tsx` — 27 UI primitive tests
-- `src/tests/boundaries.test.ts` — 3 boundary enforcement tests
+- `src/hooks/useKeyboardShortcut.ts` — Generic keyboard shortcut hook
+- `src/components/CommandPalette.tsx` — Command palette dialog + shortcut hook export
+- `src/tests/keyboard-shortcut.test.tsx` — 7 keyboard shortcut hook tests
+- `src/tests/ui-store.test.ts` — 11 UI store tests
+- `src/tests/command-palette.test.tsx` — 10 command palette tests
+- `src/tests/session-ux.test.tsx` — 18 session UX tests
 
 ### Files Modified
-- `package.json` — Added `check:boundaries` script
-- `src/components/ContextPanel.tsx` — Refactored to use `Panel` + `Tabs` primitives
-- `src/components/SessionList.tsx` — Refactored to use `Badge` + `SESSION_STATUS_VISUALS`
-- `src/components/MessageFeed.tsx` — Refactored to use `Button` + `Badge` primitives
-- `src/components/LoadablePanel.tsx` — Updated import to contracts
-- `src/components/SessionsPanel.tsx` — Refactored to use `Badge` primitive
-- `src/components/TopToolbar.tsx` — Improved selector labels with DEMO badges
-- `src/tests/app-shell.test.tsx` — Updated 2 tests for refactored components
-- `IMPLEMENTATION_MANIFEST.md` — Updated with Phase 1B information
+- `src/store/useUiStore.ts` — Added `commandPaletteOpen`, `setCommandPaletteOpen`, `toggleCommandPalette`
+- `src/components/AppShell.tsx` — Integrates CommandPalette and keyboard shortcut
+- `src/components/TopToolbar.tsx` — Added command palette button with `⌘K` hint
+- `src/components/SessionsPanel.tsx` — Rewritten with status filters, sort controls, count badges, clear
+- `src/components/SessionList.tsx` — Keyboard navigation, scrollIntoView, tabIndex
+- `src/components/ContextPanel.tsx` — Wording polish for sections and footer
+- `scripts/check-forbidden-integrations.mjs` — Expanded with literal patterns and config file scanning
+- `src/tests/app-shell.test.tsx` — Added 2 tests for command palette button
+- `IMPLEMENTATION_MANIFEST.md` — Updated with Phase 1C information
 
 ### Files Deleted
 - None
 
 ---
 
-## Validation Results (Phase 1B)
+## Validation Results (Phase 1C)
 
 | Command | Result |
 |---|---|
+| `npm run typecheck` | PASS |
 | `npm run check:boundaries` | PASS |
-| `npm run test:run` (vitest run) | PASS (55/55 tests) |
-| `npm run build` (tsc -b && vite build) | _pending CI_ |
+| `npm run test:run` (vitest run) | PASS (102/102 tests) |
+| `npm run lint` | _pending_ |
+| `npm run build` (tsc -b && vite build) | _pending_ |
+
+---
 
 ## CI Workflow
 - `.github/workflows/frontend-ci.yml`
@@ -118,12 +154,9 @@
 - Steps: `npm ci` → `lint` → `typecheck` → `test:run` → **`check:boundaries`** → `build`
 - Dependency caching via package-lock.json
 
-## Known Issues
-- None identified in Phase 1B.
-
-## Deferred Functionality (not implemented in Phase 1A or 1B)
+## Deferred Functionality (not implemented in Phase 1A, 1B, or 1C)
 - Fastify/Express gateway integration
-- OpenCode SDK and SSE event streaming (Phase 1C)
+- OpenCode SDK and SSE event streaming
 - WebContainer preview runtime
 - Real API requests and session creation
 - PTY / Terminal server
@@ -135,6 +168,6 @@
 ---
 
 ## Next Bounded Slice
-**Frontend Phase 1C — SDK Client and Event Streaming Scaffolding**
+**Frontend Phase 1D — TBD**
 
-This slice will introduce the OpenCode SDK client layer, SSE EventSource integration, and real gateway connection. It requires a backend gateway to be present. Phase 1A and 1B remain fully frontend-only.
+Phase 1C remains fully frontend-only with no backend dependencies.

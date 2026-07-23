@@ -56,7 +56,7 @@ export const ContextPanel: React.FC = () => {
     <Panel
       title="Workspace & Context"
       badge={<Badge>Phase 1A</Badge>}
-      footer="Note: Workspace panel displays frontend demo representation."
+      footer="Frontend demo view — does not reflect model's full context window."
       bodyClassName="p-3"
     >
       <Tabs items={sections} activeId={activeContextSection} onChange={setActiveContextSection} />
@@ -67,7 +67,7 @@ export const ContextPanel: React.FC = () => {
         {activeContextSection === 'referenced' && (
           <div className="space-y-2">
             <div className="text-[11px] font-medium text-slate-400 mb-2">
-              Files explicitly attached to model prompt context
+              Files attached to prompt context (frontend demo view)
             </div>
             {DEMO_REFERENCED_FILES.length === 0 ? (
               <div className="py-8 text-center text-slate-500 text-xs">No files referenced.</div>
@@ -143,7 +143,7 @@ export const ContextPanel: React.FC = () => {
         {activeContextSection === 'workspace' && (
           <div className="space-y-1">
             <div className="text-[11px] font-medium text-slate-400 mb-2">
-              Local repository file tree browser
+              Workspace file structure (frontend demo view)
             </div>
             {DEMO_WORKSPACE_FILES.map((item) => (
               <div
