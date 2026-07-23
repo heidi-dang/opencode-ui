@@ -2,7 +2,7 @@
 
 **Frontend web client foundation for the OpenCode headless AI development platform.**
 
-Current phase: **Phase 1D — Accessibility Pass, Visual QA, and Layout Stress Testing**
+Current phase: **Phase 1E — Readiness Audit and Gateway Integration Contract Prep**
 
 ## Implemented Routes
 
@@ -46,12 +46,18 @@ npm run build       # Production build (typecheck + Vite build)
 ```
 opencode-ui/
 ├── src/
+│   ├── adapters/       # Demo data adapter (Phase 1E)
 │   ├── components/     # Reusable UI components
+│   ├── contracts/      # TypeScript contracts and view models
+│   ├── hooks/          # Custom React hooks
 │   ├── pages/          # Route page components
 │   ├── store/          # Zustand state management
 │   ├── mocks/          # Phase 1A demo/mock data
 │   ├── types/          # TypeScript type definitions
 │   └── tests/          # Vitest test suite
+├── docs/
+│   ├── readiness/      # Frontend readiness audit
+│   └── contracts/      # Gateway integration contract docs
 ├── .github/workflows/  # CI configuration
 ├── eslint.config.js    # ESLint flat configuration
 ├── vite.config.ts      # Vite + Vitest configuration

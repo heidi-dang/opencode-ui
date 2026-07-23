@@ -104,6 +104,7 @@ const FORBIDDEN_IMPORTS = [
 
   // HTTP client libraries
   'axios',
+  'XMLHttpRequest',
 ];
 
 // ── Patterns that require an import/require context ──────────────────
@@ -137,6 +138,7 @@ const LITERAL_PATTERNS = [
   { pattern: '127.0.0.1:', wordBoundary: false },
   // Network request patterns — catch actual function calls, not string references
   { pattern: 'fetch(', wordBoundary: true },
+  { pattern: 'XMLHttpRequest', wordBoundary: true },
 ];
 
 // ── Scan logic ──────────────────────────────────────────────────────
@@ -148,6 +150,7 @@ const excludeDirs = new Set([
   '.git',
   '.vite',
   'coverage',
+  'docs',
 ]);
 
 const issues = [];
@@ -214,7 +217,7 @@ for (const file of allFiles) {
     file.endsWith('.json')
   ) {
     // Skip files that deliberately check for these patterns (boundary tests)
-    if (file.includes('boundaries.test.ts') || file.includes('boundary-contract.test.ts')) continue;
+    if (file.includes('boundaries.test.ts') || file.includes('boundary-contract.test.ts') || file.includes('readiness-docs.test')) continue;
     if (file.endsWith('check-forbidden-integrations.mjs')) continue;
 
     for (const { pattern, wordBoundary } of LITERAL_PATTERNS) {
