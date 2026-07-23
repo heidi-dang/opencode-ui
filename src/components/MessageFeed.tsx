@@ -12,6 +12,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { DEMO_MESSAGES } from '../mocks/frontendDemoData';
+import { Badge, Button } from './ui';
 
 export const MessageFeed: React.FC = () => {
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
@@ -20,6 +21,28 @@ export const MessageFeed: React.FC = () => {
     navigator.clipboard.writeText(code);
     setCopiedCodeId(id);
     setTimeout(() => setCopiedCodeId(null), 2000);
+  };
+
+  const getToolStatusBadge = (
+    status: string
+  ): { variant: 'success' | 'warning' | 'danger'; icon: React.ReactNode } => {
+    switch (status) {
+      case 'success':
+        return {
+          variant: 'success',
+          icon: <CheckCircle2 className="w-3 h-3" />,
+        };
+      case 'running':
+        return {
+          variant: 'warning',
+          icon: <Loader2 className="w-3 h-3 animate-spin" />,
+        };
+      default:
+        return {
+          variant: 'danger',
+          icon: <AlertCircle className="w-3 h-3" />,
+        };
+    }
   };
 
   return (
@@ -71,10 +94,10 @@ export const MessageFeed: React.FC = () => {
                       <span className="text-[11px] font-semibold text-slate-300">
                         {block.filename}
                       </span>
-                      <button
-                        type="button"
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleCopyCode(block.code, codeId)}
-                        className="flex items-center gap-1 text-[10px] hover:text-slate-100 px-1.5 py-0.5 rounded bg-slate-800/80 transition-colors focus-ring"
                         aria-label="Copy code block"
                       >
                         {isCopied ? (
@@ -88,7 +111,7 @@ export const MessageFeed: React.FC = () => {
                             <span>Copy</span>
                           </>
                         )}
-                      </button>
+                      </Button>
                     </div>
                     <pre className="p-3 text-[11px] text-slate-200 overflow-x-auto leading-normal">
                       <code>{block.code}</code>
@@ -108,21 +131,19 @@ export const MessageFeed: React.FC = () => {
                 <span className="text-[11px] text-slate-400">{msg.toolActivity.action}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                {msg.toolActivity.status === 'success' && (
-                  <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-mono">
-                    <CheckCircle2 className="w-3 h-3" /> Success
-                  </span>
-                )}
-                {msg.toolActivity.status === 'running' && (
-                  <span className="flex items-center gap-1 text-[10px] text-amber-400 font-mono">
-                    <Loader2 className="w-3 h-3 animate-spin" /> Running
-                  </span>
-                )}
-                {msg.toolActivity.status === 'error' && (
-                  <span className="flex items-center gap-1 text-[10px] text-red-400 font-mono">
-                    <AlertCircle className="w-3 h-3" /> Failed
-                  </span>
-                )}
+                {(() => {
+                  const { variant, icon } = getToolStatusBadge(msg.toolActivity!.status);
+                  return (
+                    <Badge variant={variant}>
+                      {icon}
+                      {variant === 'success'
+                        ? 'Success'
+                        : variant === 'warning'
+                          ? 'Running'
+                          : 'Failed'}
+                    </Badge>
+                  );
+                })()}
               </div>
             </div>
           )}

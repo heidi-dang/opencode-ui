@@ -1,8 +1,8 @@
 import React from 'react';
 import { Loader2, AlertCircle, RefreshCw, Inbox, WifiOff } from 'lucide-react';
-import { LoadableState } from '../types/ui';
+import type { LoadableState } from '../contracts/presentation';
 
-interface LoadablePanelProps {
+export interface LoadablePanelProps {
   state: LoadableState;
   onRetry?: () => void;
   loadingMessage?: string;

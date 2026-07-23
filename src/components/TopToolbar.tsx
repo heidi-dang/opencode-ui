@@ -202,8 +202,11 @@ export const TopToolbar: React.FC = () => {
 
               {activeDropdown === 'agent' && (
                 <div className="absolute top-full left-0 mt-1 w-60 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-50 p-1">
-                  <div className="px-2 py-1 text-[10px] font-mono uppercase text-slate-400 font-semibold">
-                    Agent Engine Placeholder
+                  <div className="px-2 py-1 text-[10px] font-mono uppercase text-slate-400 font-semibold flex items-center justify-between">
+                    Agent Engine
+                    <span className="text-[9px] px-1 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">
+                      DEMO
+                    </span>
                   </div>
                   {DEMO_AGENTS.map((ag) => (
                     <button
@@ -243,8 +246,11 @@ export const TopToolbar: React.FC = () => {
 
               {activeDropdown === 'model' && (
                 <div className="absolute top-full left-0 mt-1 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-50 p-1">
-                  <div className="px-2 py-1 text-[10px] font-mono uppercase text-slate-400 font-semibold">
+                  <div className="px-2 py-1 text-[10px] font-mono uppercase text-slate-400 font-semibold flex items-center justify-between">
                     Model Selection
+                    <span className="text-[9px] px-1 py-0.5 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30 font-bold">
+                      DEMO
+                    </span>
                   </div>
                   {DEMO_MODELS.map((md) => (
                     <button

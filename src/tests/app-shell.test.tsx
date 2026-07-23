@@ -103,13 +103,12 @@ describe('Context tabs', () => {
   it('changes between referenced, modified, workspace, and todos sections', async () => {
     renderApp('/builder');
 
-    // Find the context panel by its heading, then scope queries
-    const contextHeading = screen.getByRole('heading', { name: /Workspace & Context/i });
-    const contextPanel = contextHeading.closest('aside');
-    expect(contextPanel).toBeTruthy();
+    // Find the tablist rendered by the Tabs primitive
+    const tablist = screen.getByRole('tablist');
+    expect(tablist).toBeTruthy();
 
-    const tabs = within(contextPanel!).getAllByRole('button');
-    // Find buttons by their text content
+    const tabs = within(tablist).getAllByRole('tab');
+    // Find tabs by their accessible name (text content)
     const referencedBtn = tabs.find((b) => b.textContent?.includes('Referenced'));
     const modifiedBtn = tabs.find((b) => b.textContent?.includes('Modified'));
     const workspaceBtn = tabs.find((b) => b.textContent?.includes('Workspace'));
@@ -195,7 +194,7 @@ describe('Selector dropdowns', () => {
     const agentButton = within(header).getByText(/Coder Agent v2.4/i).closest('button');
     expect(agentButton).toBeTruthy();
     await userEvent.click(agentButton!);
-    expect(screen.getByText(/Agent Engine Placeholder/i)).toBeInTheDocument();
+    expect(screen.getByText(/Agent Engine/i)).toBeInTheDocument();
 
     expect(fetchSpy).not.toHaveBeenCalled();
     fetchSpy.mockRestore();
