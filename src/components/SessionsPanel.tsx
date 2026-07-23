@@ -74,7 +74,7 @@ export const SessionsPanel: React.FC = () => {
   };
 
   return (
-    <aside className="h-full flex flex-col bg-slate-950 text-slate-200 border-r border-slate-800/80 w-full select-none">
+    <aside className="h-full flex flex-col bg-slate-950 text-slate-200 border-r border-slate-800/80 w-full select-none min-w-0">
       {/* Panel Header */}
       <div className="p-3 border-b border-slate-800/80 space-y-2.5">
         <div className="flex items-center justify-between">
@@ -91,6 +91,7 @@ export const SessionsPanel: React.FC = () => {
         <button
           type="button"
           disabled
+          aria-disabled="true"
           className="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg text-xs font-semibold bg-amber-500/10 border border-amber-500/20 text-amber-500/60 cursor-not-allowed"
           title="Session creation requires OpenCode Gateway connected in Phase 2"
         >
@@ -145,6 +146,7 @@ export const SessionsPanel: React.FC = () => {
                   : 'text-slate-500 hover:text-slate-300'
               }`}
               aria-pressed={sortMode === mode}
+              aria-label={`Sort by ${mode}`}
             >
               {mode === 'recent' ? 'Recent' : mode === 'status' ? 'Status' : 'Name'}
             </button>

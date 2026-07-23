@@ -5,10 +5,11 @@
 - **Phase**: 1
 - **Slice**: 1A — Production Shell and Interaction Foundation (baseline)
 - **Slice**: 1B — Design-System Hardening and Frontend Contract Boundaries (baseline)
-- **Slice**: 1C — Command Palette, Session UX, and Keyboard Interactions (current)
-- **Status**: Phase 1C implemented
+- **Slice**: 1C — Command Palette, Session UX, and Keyboard Interactions (baseline)
+- **Slice**: 1D — Accessibility Pass, Visual QA, and Layout Stress Testing (current)
+- **Status**: Phase 1D implemented
 - **Baseline commit**: `b2a1106be0fcc751e9e886835f8e7bbe0f962bdb` (Phase 1A)
-- **Current branch**: `feat/frontend-phase-1c-interactions`
+- **Current branch**: `feat/frontend-phase-1d-accessibility-visual-qa`
 
 ---
 
@@ -143,8 +144,103 @@
 | `npm run typecheck` | PASS |
 | `npm run check:boundaries` | PASS |
 | `npm run test:run` (vitest run) | PASS (102/102 tests) |
-| `npm run lint` | _pending_ |
-| `npm run build` (tsc -b && vite build) | _pending_ |
+| `npm run lint` | PASS |
+| `npm run build` (tsc -b && vite build) | PASS |
+
+---
+
+### Phase 1D (current additions)
+1. **Accessibility Hardening**:
+   - `useFocusRestore` hook (`src/hooks/useFocusRestore.ts`) — saves and restores focus on activation/deactivation.
+   - `useFocusTrap` hook (`src/hooks/useFocusTrap.ts`) — traps Tab/Shift+Tab focus within a container.
+   - Command palette focus trap integration and improved focus restoration on close.
+   - `aria-expanded` on all panel toggle buttons, drawer triggers, and selector dropdowns.
+   - `aria-current="page"` on active navigation links and `aria-current="true"` on active session items.
+   - `aria-haspopup="dialog"` on command palette button and `aria-haspopup="listbox"` on selectors.
+   - `aria-disabled="true"` on disabled buttons with visible explanations.
+   - `aria-label` on icon-only buttons, sort controls, and file items.
+   - Backdrop `aria-label="Close"` on command palette.
+   - Mobile drawer Escape close and focus trap.
+   - Reduced-motion support via `@media (prefers-reduced-motion: reduce)` in `index.css`.
+   - Visible focus rings validated in both light and dark mode.
+2. **Visual QA and Layout Containment**:
+   - Layout hardening across all scroll-prone components with `truncate`, `break-all`, `max-w-full overflow-hidden`, `min-w-0`.
+   - Session titles, workspace names, branch names truncated to prevent overflow.
+   - File paths in ContextPanel use `break-all` for long path containment.
+   - Command palette dialog uses `mx-2` for mobile containment.
+   - MessageFeed uses `max-w-full overflow-hidden` and `break-words` for content containment.
+   - Code blocks scroll internally (existing CodeBlock primitive).
+   - No horizontal page overflow at any viewport width.
+3. **Stress-Test Demo Data** (`src/mocks/frontendStressData.ts`):
+   - `STRESS_SESSION_TITLE` (200+ chars), `STRESS_WORKSPACE_NAME` (100+ chars), `STRESS_BRANCH_NAME` (80+ chars).
+   - `STRESS_FILE_PATH` (259 chars deep path), `STRESS_LONG_MARKDOWN` (500+ chars).
+   - `STRESS_LONG_CODE` (30+ line code block), `STRESS_TODOS` (21 items), `STRESS_WORKFLOW_OUTPUT` (1000+ chars).
+   - `STRESS_SESSIONS_COUNT` = 50.
+   - Opt-in only, not persisted in Zustand, not mixed into canonical app state.
+4. **QA Route** (`/qa`):
+   - `src/pages/QualityAssurancePage.tsx` — full QA sandbox page.
+   - UI State Gallery: Button/Badge/Panel/Tabs/StateBlock all variants.
+   - Empty/Loading/Error/Degraded state demos.
+   - Stress Data Rendering section (8 panels).
+   - Typography samples (h1-h6, body, code, small text).
+   - Focus ring examples (buttons, inputs, links).
+   - Reduced-motion notes and Accessibility Check section.
+   - Clear label: "Frontend QA sandbox — demo only."
+   - Added to router at `/qa` and navigation (PrimaryNavigation + CommandPalette).
+5. **Boundary Guard Expansion** (`scripts/check-forbidden-integrations.mjs`):
+   - Added `fetch(` and `axios` to forbidden patterns.
+   - `axios` added to `FORBIDDEN_IMPORTS` and `IMPORT_PATTERNS`.
+   - `fetch(` added to `LITERAL_PATTERNS` with word-boundary matching.
+6. **Expanded Test Suite**:
+   - 153 total tests (102 Phase 1A/1B/1C + 51 new Phase 1D).
+   - `accessibility-focus.test.tsx` — 13 tests for focus management, ARIA, reduced-motion.
+   - `layout-stress.test.tsx` — 20 tests for layout containment, stress data, empty/error states.
+   - `qa-route.test.tsx` — 15 tests for QA page rendering, stress rendering, UI gallery.
+   - `app-shell.test.tsx` — 1 new test for QA nav link.
+
+---
+
+## Files Changed (Phase 1D)
+
+### Files Created
+- `src/hooks/useFocusRestore.ts` — Focus restoration hook
+- `src/hooks/useFocusTrap.ts` — Focus trap hook
+- `src/mocks/frontendStressData.ts` — Stress-test mock data
+- `src/pages/QualityAssurancePage.tsx` — QA sandbox page
+- `src/tests/accessibility-focus.test.tsx` — 13 accessibility tests
+- `src/tests/layout-stress.test.tsx` — 20 layout stress tests
+- `src/tests/qa-route.test.tsx` — 15 QA route tests
+
+### Files Modified
+- `src/App.tsx` — Added `/qa` route
+- `src/index.css` — Added reduced-motion media query
+- `src/components/AppShell.tsx` — Added `aria-expanded` to drawers
+- `src/components/CommandPalette.tsx` — Focus trap, focus restore, backdrop label, QA command, mobile containment
+- `src/components/ContextPanel.tsx` — Long path containment, ARIA labels
+- `src/components/MessageFeed.tsx` — Content overflow containment
+- `src/components/PrimaryNavigation.tsx` — QA nav link, `aria-current="page"`
+- `src/components/ResponsiveDrawer.tsx` — Focus trap, Escape close, ARIA
+- `src/components/SessionList.tsx` — Long title truncation, `aria-current`
+- `src/components/SessionsPanel.tsx` — `aria-disabled`, sort labels, `min-w-0`
+- `src/components/TopToolbar.tsx` — `aria-expanded`, `aria-haspopup`, flex containment
+- `src/tests/app-shell.test.tsx` — QA nav link test
+- `scripts/check-forbidden-integrations.mjs` — Added `fetch(`, `axios`
+- `IMPLEMENTATION_MANIFEST.md` — Updated with Phase 1D information
+
+### Files Deleted
+- None
+
+---
+
+## Validation Results (Phase 1D)
+
+| Command | Result |
+|---|---|
+| `npm run check:boundaries` | PASS |
+| `npm run lint` | PASS (0 errors, 0 warnings) |
+| `npm run typecheck` | PASS |
+| `npm run test:run` (vitest run) | PASS (153/153 tests, 11 files) |
+| `npm run build` (tsc -b && vite build) | PASS |
 
 ---
 
@@ -154,7 +250,7 @@
 - Steps: `npm ci` → `lint` → `typecheck` → `test:run` → **`check:boundaries`** → `build`
 - Dependency caching via package-lock.json
 
-## Deferred Functionality (not implemented in Phase 1A, 1B, or 1C)
+## Deferred Functionality (not implemented in Phase 1A through 1D)
 - Fastify/Express gateway integration
 - OpenCode SDK and SSE event streaming
 - WebContainer preview runtime
@@ -167,7 +263,12 @@
 
 ---
 
-## Next Bounded Slice
-**Frontend Phase 1D — TBD**
+## Known Issues
+- None identified in Phase 1D.
 
-Phase 1C remains fully frontend-only with no backend dependencies.
+## Next Bounded Slice
+**Frontend Phase 1E — Frontend Readiness Audit and Gateway Integration Contract Prep**
+
+Do not start Phase 1E.
+
+Phase 1D remains fully frontend-only with no backend dependencies.

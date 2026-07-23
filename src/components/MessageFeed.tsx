@@ -50,7 +50,7 @@ export const MessageFeed: React.FC = () => {
       {DEMO_MESSAGES.map((msg) => (
         <article
           key={msg.id}
-          className={`p-4 rounded-2xl border transition-colors ${
+          className={`p-4 rounded-2xl border transition-colors max-w-full overflow-hidden ${
             msg.role === 'user'
               ? 'bg-amber-500/5 border-amber-500/20 ml-4 sm:ml-12'
               : 'bg-slate-900/80 dark:bg-slate-900/90 border-slate-800 mr-4 sm:mr-8 shadow-xs'
@@ -74,7 +74,7 @@ export const MessageFeed: React.FC = () => {
           </div>
 
           {/* Content */}
-          <div className="text-xs text-slate-300 space-y-2 whitespace-pre-wrap leading-relaxed select-text">
+          <div className="text-xs text-slate-300 space-y-2 whitespace-pre-wrap leading-relaxed select-text break-words">
             {msg.content}
           </div>
 

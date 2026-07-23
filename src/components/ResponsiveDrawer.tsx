@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 interface ResponsiveDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   side?: 'left' | 'right';
+  'aria-expanded'?: boolean;
   children: React.ReactNode;
 }
 
@@ -15,7 +17,13 @@ export const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
   title,
   side = 'left',
   children,
+  ...props
 }) => {
+  const drawerContainerRef = useRef<HTMLDivElement>(null);
+
+  // Trap focus inside the drawer when open
+  useFocusTrap(isOpen, drawerContainerRef);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -39,12 +47,14 @@ export const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
 
       {/* Drawer Container */}
       <div
+        ref={drawerContainerRef}
         className={`relative z-10 w-4/5 max-w-sm bg-slate-900 text-slate-100 h-full flex flex-col shadow-2xl transition-transform duration-200 ${
           side === 'right' ? 'ml-auto border-l border-slate-800' : 'mr-auto border-r border-slate-800'
         }`}
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        {...props}
       >
         <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
           <h3 className="text-sm font-semibold tracking-wide text-slate-200">{title}</h3>

@@ -64,13 +64,14 @@ export const TopToolbar: React.FC = () => {
     <header className="sticky top-0 z-40 bg-slate-900/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-800 text-slate-100 px-3 py-2 transition-colors">
       <div className="flex items-center justify-between gap-2">
         {/* Left Section: Brand & Panel Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           {/* Mobile Sessions Drawer Toggle */}
           <button
             onClick={() => setMobileNavigationOpen(true)}
             type="button"
             className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 focus-ring"
             aria-label="Open sessions drawer"
+            aria-expanded={false}
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -82,6 +83,7 @@ export const TopToolbar: React.FC = () => {
             className="hidden lg:flex items-center justify-center p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors focus-ring"
             aria-label={leftPanelOpen ? 'Collapse left panel' : 'Expand left panel'}
             title={leftPanelOpen ? 'Collapse left panel' : 'Expand left panel'}
+            aria-expanded={leftPanelOpen}
           >
             {leftPanelOpen ? (
               <PanelLeftClose className="w-4 h-4 text-amber-500" />
@@ -106,13 +108,15 @@ export const TopToolbar: React.FC = () => {
           </div>
 
           {/* Selectors Group (Workspace, Branch, Agent, Model) */}
-          <div className="hidden md:flex items-center gap-1.5">
+          <div className="hidden md:flex items-center gap-1.5 flex-wrap min-w-0">
             {/* Workspace Selector */}
-            <div className="relative">
+            <div className="relative min-w-0">
               <button
                 type="button"
                 onClick={() => toggleDropdown('workspace')}
                 className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-slate-300 bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700/60 focus-ring"
+                aria-expanded={activeDropdown === 'workspace'}
+                aria-haspopup="listbox"
               >
                 <FolderGit2 className="w-3.5 h-3.5 text-amber-400" />
                 <span className="max-w-[110px] truncate">
@@ -149,11 +153,13 @@ export const TopToolbar: React.FC = () => {
             </div>
 
             {/* Branch Selector */}
-            <div className="relative">
+            <div className="relative min-w-0">
               <button
                 type="button"
                 onClick={() => toggleDropdown('branch')}
                 className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-slate-300 bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700/60 focus-ring"
+                aria-expanded={activeDropdown === 'branch'}
+                aria-haspopup="listbox"
               >
                 <GitBranch className="w-3.5 h-3.5 text-blue-400" />
                 <span className="max-w-[120px] truncate">
@@ -190,11 +196,13 @@ export const TopToolbar: React.FC = () => {
             </div>
 
             {/* Agent Selector Placeholder */}
-            <div className="relative">
+            <div className="relative min-w-0">
               <button
                 type="button"
                 onClick={() => toggleDropdown('agent')}
                 className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-slate-300 bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700/60 focus-ring"
+                aria-expanded={activeDropdown === 'agent'}
+                aria-haspopup="listbox"
               >
                 <Bot className="w-3.5 h-3.5 text-emerald-400" />
                 <span className="max-w-[90px] truncate">
@@ -234,11 +242,13 @@ export const TopToolbar: React.FC = () => {
             </div>
 
             {/* Model Selector Placeholder */}
-            <div className="relative">
+            <div className="relative min-w-0">
               <button
                 type="button"
                 onClick={() => toggleDropdown('model')}
                 className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-slate-300 bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700/60 focus-ring"
+                aria-expanded={activeDropdown === 'model'}
+                aria-haspopup="listbox"
               >
                 <Cpu className="w-3.5 h-3.5 text-purple-400" />
                 <span className="max-w-[100px] truncate">
@@ -287,18 +297,19 @@ export const TopToolbar: React.FC = () => {
         </div>
 
         {/* Center Section: Main Route Navigation */}
-        <div className="flex items-center">
+        <div className="flex items-center shrink-0">
           <PrimaryNavigation />
         </div>
 
         {/* Right Section: Connection, Theme, Panel Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Command Palette Button */}
           <button
             onClick={() => setCommandPaletteOpen(true)}
             type="button"
             className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors focus-ring text-xs"
             aria-label="Open command palette"
+            aria-haspopup="dialog"
             title="Open command palette (Cmd+K)"
           >
             <Search className="w-3.5 h-3.5" />
@@ -337,6 +348,7 @@ export const TopToolbar: React.FC = () => {
             className="hidden lg:flex items-center justify-center p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors focus-ring"
             aria-label={rightPanelOpen ? 'Collapse context panel' : 'Expand context panel'}
             title={rightPanelOpen ? 'Collapse context panel' : 'Expand context panel'}
+            aria-expanded={rightPanelOpen}
           >
             {rightPanelOpen ? (
               <PanelRightClose className="w-4 h-4 text-amber-500" />
@@ -351,6 +363,7 @@ export const TopToolbar: React.FC = () => {
             type="button"
             className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 focus-ring"
             aria-label="Open context drawer"
+            aria-expanded={false}
           >
             <SlidersHorizontal className="w-5 h-5" />
           </button>

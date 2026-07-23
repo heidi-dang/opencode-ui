@@ -2,7 +2,7 @@
 
 **Frontend web client foundation for the OpenCode headless AI development platform.**
 
-Current phase: **Phase 1C — Command Palette, Session UX, and Keyboard Interactions**
+Current phase: **Phase 1D — Accessibility Pass, Visual QA, and Layout Stress Testing**
 
 ## Implemented Routes
 
@@ -11,6 +11,7 @@ Current phase: **Phase 1C — Command Palette, Session UX, and Keyboard Interact
 | `/` | Redirects to `/builder` |
 | `/builder` | Three-panel builder workspace (sessions, chat, context) |
 | `/live-preview` | Intentional empty state for preview runtime (Phase 9) |
+| `/qa` | Frontend QA sandbox — UI gallery, stress data, accessibility tests |
 | `/*` | 404 Not Found page |
 
 ## Technology Stack
@@ -59,7 +60,7 @@ opencode-ui/
 
 ## Deferred Functionality
 
-The following features are **not implemented** in Phase 1A, 1B, or 1C:
+The following features are **not implemented** in Phase 1A through 1D:
 
 - Fastify/Express gateway integration
 - OpenCode SDK and SSE event streaming

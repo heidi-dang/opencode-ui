@@ -76,12 +76,13 @@ export const ContextPanel: React.FC = () => {
                 <div
                   key={file.id}
                   className="p-2 rounded-xl bg-slate-900/60 border border-slate-800/80 flex items-center justify-between text-xs hover:border-slate-700 transition-colors"
+                  aria-label={`Referenced file: ${file.path}`}
                 >
-                  <div className="flex items-center gap-2 truncate">
+                  <div className="flex items-center gap-2 truncate max-w-full overflow-hidden">
                     <FileText className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                    <span className="font-mono text-slate-200 truncate">{file.path}</span>
+                    <span className="font-mono text-slate-200 truncate break-all">{file.path}</span>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-mono">{file.size}</span>
+                  <span className="text-[10px] text-slate-500 font-mono shrink-0">{file.size}</span>
                 </div>
               ))
             )}
@@ -122,8 +123,8 @@ export const ContextPanel: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pl-5">
-                    <span className="truncate text-slate-500">{file.path}</span>
+                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pl-5 max-w-full overflow-hidden">
+                    <span className="truncate text-slate-500 break-all">{file.path}</span>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {file.linesAdded !== undefined && (
                         <span className="text-emerald-400">+{file.linesAdded}</span>
@@ -151,14 +152,15 @@ export const ContextPanel: React.FC = () => {
                 className={`p-1.5 rounded-lg flex items-center justify-between text-xs hover:bg-slate-900 transition-colors ${
                   item.isDir ? 'font-semibold text-slate-200' : 'text-slate-300 font-mono'
                 }`}
+                aria-label={`${item.isDir ? 'Directory' : 'File'}: ${item.path ?? item.name}`}
               >
-                <div className="flex items-center gap-2 truncate">
+                <div className="flex items-center gap-2 truncate max-w-full overflow-hidden">
                   {item.isDir ? (
                     <Folder className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                   ) : (
                     <File className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   )}
-                  <span className="truncate">{item.name}</span>
+                  <span className="truncate break-all">{item.name}</span>
                 </div>
                 {item.size && (
                   <span className="text-[10px] text-slate-500 font-mono">{item.size}</span>

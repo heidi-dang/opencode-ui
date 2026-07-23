@@ -14,9 +14,11 @@ import {
   FolderTree,
   CheckSquare,
   Command,
+  Beaker,
 } from 'lucide-react';
 import { useUiStore } from '../store/useUiStore';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import type { AppearanceMode, ContextSection } from '../contracts/presentation';
 
 interface CommandItem {
@@ -43,9 +45,13 @@ export const CommandPalette: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const lastFocusedRef = useRef<HTMLElement | null>(null);
 
-  // Track the previously focused element when opening
+  // Trap Tab focus within the palette while open
+  useFocusTrap(commandPaletteOpen, containerRef);
+
+  // Track the previously focused element when opening, restore on close
   useEffect(() => {
     if (commandPaletteOpen) {
       lastFocusedRef.current = document.activeElement as HTMLElement;
@@ -55,10 +61,18 @@ export const CommandPalette: React.FC = () => {
         setSearchQuery('');
         setActiveIndex(0);
       }, 50);
-    } else {
-      // Restore focus when closing
-      lastFocusedRef.current?.focus();
     }
+    return () => {
+      // Cleanup: restore focus when the effect cleans up (on unmount or deactivation)
+      if (!commandPaletteOpen && lastFocusedRef.current && typeof lastFocusedRef.current.focus === 'function') {
+        const el = lastFocusedRef.current;
+        lastFocusedRef.current = null;
+        // Use requestAnimationFrame to avoid React batching issues
+        requestAnimationFrame(() => {
+          el.focus();
+        });
+      }
+    };
   }, [commandPaletteOpen]);
 
   const commands: CommandItem[] = useMemo(
@@ -84,6 +98,18 @@ export const CommandPalette: React.FC = () => {
         category: 'navigation',
         action: () => {
           window.location.hash = '#/live-preview';
+          window.dispatchEvent(new PopStateEvent('popstate'));
+          setCommandPaletteOpen(false);
+        },
+      },
+      {
+        id: 'nav-qa',
+        label: 'Go to QA Sandbox',
+        description: 'Open the Frontend QA sandbox page',
+        icon: <Beaker className="w-4 h-4" />,
+        category: 'navigation',
+        action: () => {
+          window.location.hash = '#/qa';
           window.dispatchEvent(new PopStateEvent('popstate'));
           setCommandPaletteOpen(false);
         },
@@ -274,7 +300,10 @@ export const CommandPalette: React.FC = () => {
       aria-modal="true"
       aria-label="Command palette"
     >
-      <div className="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+      <div
+        ref={containerRef}
+        className="w-full max-w-lg mx-2 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden"
+      >
         {/* Search Input */}
         <div className="flex items-center gap-2 p-3 border-b border-slate-800">
           <Search className="w-4 h-4 text-slate-400 shrink-0" />

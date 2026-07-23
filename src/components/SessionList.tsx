@@ -93,7 +93,7 @@ export const SessionList: React.FC<SessionListProps> = ({
   return (
     <div
       ref={listRef}
-      className="space-y-1.5"
+      className="space-y-1.5 min-w-0"
       role="listbox"
       aria-label="OpenCode Sessions"
       onKeyDown={handleKeyDown}
@@ -110,6 +110,7 @@ export const SessionList: React.FC<SessionListProps> = ({
             onClick={() => onSelectSession(session.id)}
             role="option"
             aria-selected={isActive}
+            aria-current={isActive ? 'true' : undefined}
             tabIndex={isActive ? 0 : -1}
             className={`w-full text-left p-2.5 rounded-xl border transition-all focus-ring ${
               isActive
@@ -117,8 +118,8 @@ export const SessionList: React.FC<SessionListProps> = ({
                 : 'bg-slate-900/40 border-slate-800/80 text-slate-300 hover:bg-slate-800/60 hover:border-slate-700'
             }`}
           >
-            <div className="flex items-start justify-between gap-1.5 mb-1">
-              <h4 className="text-xs font-semibold line-clamp-1 flex-1 leading-snug">
+            <div className="flex items-start justify-between gap-1.5 mb-1 min-w-0">
+              <h4 className="text-xs font-semibold truncate flex-1 leading-snug">
                 {session.title}
               </h4>
               <Badge variant={statusMeta.variant}>
@@ -132,9 +133,9 @@ export const SessionList: React.FC<SessionListProps> = ({
             </p>
 
             <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
-              <span className="flex items-center gap-1">
-                <GitBranch className="w-3 h-3 text-slate-400" />
-                {session.branch}
+              <span className="flex items-center gap-1 min-w-0">
+                <GitBranch className="w-3 h-3 text-slate-400 shrink-0" />
+                <span className="truncate max-w-[120px]">{session.branch}</span>
               </span>
               <div className="flex items-center gap-2">
                 <span className="flex items-center gap-0.5">

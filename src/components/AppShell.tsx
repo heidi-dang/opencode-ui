@@ -68,6 +68,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         onClose={() => setMobileNavigationOpen(false)}
         title="OpenCode Sessions"
         side="left"
+        aria-expanded={mobileNavigationOpen}
       >
         <SessionsPanel />
       </ResponsiveDrawer>
@@ -78,6 +79,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         onClose={() => setMobileContextOpen(false)}
         title="Workspace & Context"
         side="right"
+        aria-expanded={mobileContextOpen}
       >
         <ContextPanel />
       </ResponsiveDrawer>
