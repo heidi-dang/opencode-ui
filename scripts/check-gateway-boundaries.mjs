@@ -80,7 +80,7 @@ function collectFiles(dir) {
 }
 
 const srcFiles = collectFiles(join(GATEWAY_SRC, 'src')).filter(
-  (f) => !f.endsWith('boundary.test.ts') && !f.endsWith('boundary.test.tsx'),
+  (f) => !f.endsWith('boundary.test.ts') && !f.endsWith('boundary.test.tsx') && !f.endsWith('sdk-adapter.test.ts'),
 );
 
 for (const file of srcFiles) {

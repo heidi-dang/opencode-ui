@@ -2,6 +2,9 @@ export interface GatewayConfig {
   GATEWAY_HOST: string;
   GATEWAY_PORT: number;
   NODE_ENV: string;
+  OPENCODE_SDK_ENABLED: boolean;
+  OPENCODE_SERVER_URL: string;
+  OPENCODE_DEFAULT_MODEL: string;
 }
 
 export function loadConfig(overrides?: Partial<GatewayConfig>): GatewayConfig {
@@ -14,10 +17,16 @@ export function loadConfig(overrides?: Partial<GatewayConfig>): GatewayConfig {
     );
   }
 
+  const sdkEnabledRaw = process.env.OPENCODE_SDK_ENABLED ?? 'false';
+  const sdkEnabled = sdkEnabledRaw === 'true' || sdkEnabledRaw === '1';
+
   const config: GatewayConfig = {
     GATEWAY_HOST: process.env.GATEWAY_HOST ?? '127.0.0.1',
     GATEWAY_PORT: port,
     NODE_ENV: process.env.NODE_ENV ?? 'development',
+    OPENCODE_SDK_ENABLED: sdkEnabled,
+    OPENCODE_SERVER_URL: process.env.OPENCODE_SERVER_URL ?? '',
+    OPENCODE_DEFAULT_MODEL: process.env.OPENCODE_DEFAULT_MODEL ?? '',
   };
 
   return { ...config, ...overrides };
