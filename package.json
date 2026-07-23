@@ -14,7 +14,13 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "check:boundaries": "node scripts/check-forbidden-integrations.mjs"
+    "check:boundaries": "node scripts/check-forbidden-integrations.mjs && node scripts/check-gateway-boundaries.mjs",
+    "gateway:install": "npm install --prefix apps/gateway",
+    "gateway:dev": "npm run dev --prefix apps/gateway",
+    "gateway:build": "npm run build --prefix apps/gateway",
+    "gateway:test": "npm run test:run --prefix apps/gateway",
+    "gateway:typecheck": "npm run typecheck --prefix apps/gateway",
+    "gateway:check": "npm run check --prefix apps/gateway"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",

@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  validate:
+  frontend-validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,3 +36,44 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  gateway-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install gateway dependencies
+        run: npm ci --prefix apps/gateway
+
+      - name: Gateway typecheck
+        run: npm run typecheck --prefix apps/gateway
+
+      - name: Gateway test
+        run: npm run test:run --prefix apps/gateway
+
+      - name: Gateway build
+        run: npm run build --prefix apps/gateway
+
+  contracts-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install contracts dependencies
+        run: npm ci --prefix packages/contracts
+
+      - name: Contracts typecheck
+        run: npm run typecheck --prefix packages/contracts
+
+      - name: Contracts test
+        run: npm run test:run --prefix packages/contracts
