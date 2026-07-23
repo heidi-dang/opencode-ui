@@ -7,10 +7,11 @@
 - **Slice**: 1B — Design-System Hardening and Frontend Contract Boundaries (baseline)
 - **Slice**: 1C — Command Palette, Session UX, and Keyboard Interactions (baseline)
 - **Slice**: 1D — Accessibility Pass, Visual QA, and Layout Stress Testing (baseline)
-- **Slice**: 1E — Readiness Audit and Gateway Integration Contract Prep (current)
-- **Status**: Phase 1E implemented
+- **Slice**: 1E — Readiness Audit and Gateway Integration Contract Prep (baseline)
+- **Slice**: 2A — Gateway Scaffold and Contract Tests (current)
+- **Status**: Phase 2A implemented
 - **Baseline commit**: `b2a1106be0fcc751e9e886835f8e7bbe0f962bdb` (Phase 1A)
-- **Current branch**: `feat/frontend-phase-1e-readiness-contracts`
+- **Current branch**: `feat/phase-2a-gateway-scaffold`
 
 ---
 
@@ -314,31 +315,119 @@
 
 ---
 
+### Phase 2A (current additions)
+1. **Gateway Server Scaffold** (`apps/gateway/`):
+   - Fastify v5 HTTP server with TypeScript.
+   - Server factory (`buildServer()`) for testability — does not call `.listen()` directly.
+   - Environment-driven config (`GATEWAY_HOST`, `GATEWAY_PORT`, `NODE_ENV`) with validation.
+   - Request ID middleware (`x-request-id` header, `crypto.randomUUID()` fallback).
+   - Custom error handler returning safe JSON; masks internals in production.
+   - Graceful shutdown on SIGINT/SIGTERM.
+2. **Gateway Endpoints**:
+   - `GET /health` — Returns scaffold mode, version.
+   - `GET /ready` — Reports OpenCode not-connected, SDK not-installed, SSE not-implemented.
+   - `GET /contract/status` — Reports contract-only mode, all capabilities mock.
+   - `GET /contract/demo/sessions` — 4 static demo `GatewaySessionView` entries.
+   - `GET /contract/demo/messages` — 7 static demo `GatewayMessageView` entries.
+3. **Shared Contracts Package** (`packages/contracts/`):
+   - Zod schemas for all gateway view models (`GatewaySessionView`, `GatewayMessageView`, etc.).
+   - TypeScript type exports for frontend-safe contracts.
+   - Event type definitions for future SSE phases.
+   - Error response contract.
+4. **Boundary Guard Expansion**:
+   - `scripts/check-gateway-boundaries.mjs` — Scans `apps/gateway/` for forbidden patterns (SDK, SSE, WebSocket, SQLite, PTY).
+   - Root `npm run check:boundaries` now runs both frontend and gateway boundary checks.
+5. **Updated CI** (`.github/workflows/frontend-ci.yml`):
+   - Three parallel jobs: `frontend-validate`, `gateway-validate`, `contracts-validate`.
+   - Frontend gates unchanged. Gateway gates: install, typecheck, test, build.
+   - Contracts gates: install, typecheck, test.
+6. **Expanded Test Suite**:
+   - 223 total tests (186 frontend + 26 gateway + 11 contracts).
+   - Gateway: health, contract, config, boundary tests.
+   - Contracts: Zod schema validation tests.
+
+---
+
+## Files Changed (Phase 2A)
+
+### Files Created
+- `apps/gateway/package.json` — Gateway package config
+- `apps/gateway/tsconfig.json` — Gateway TypeScript config
+- `apps/gateway/vitest.config.ts` — Gateway Vitest config
+- `apps/gateway/.env.example` — Gateway environment template
+- `apps/gateway/src/index.ts` — Gateway entry point
+- `apps/gateway/src/server.ts` — Gateway server factory
+- `apps/gateway/src/config.ts` — Environment config loader
+- `apps/gateway/src/routes/health.ts` — Health and readiness endpoints
+- `apps/gateway/src/routes/contract.ts` — Contract demo endpoints
+- `apps/gateway/src/middleware/requestId.ts` — Request ID middleware
+- `apps/gateway/src/middleware/errorHandler.ts` — Custom error handler
+- `apps/gateway/src/tests/health.test.ts` — 6 health endpoint tests
+- `apps/gateway/src/tests/contract.test.ts` — 10 contract endpoint tests
+- `apps/gateway/src/tests/config.test.ts` — 4 config tests
+- `apps/gateway/src/tests/boundary.test.ts` — 5 gateway boundary tests
+- `packages/contracts/package.json` — Contracts package config
+- `packages/contracts/tsconfig.json` — Contracts TypeScript config
+- `packages/contracts/vitest.config.ts` — Contracts Vitest config
+- `packages/contracts/src/index.ts` — Contracts barrel export
+- `packages/contracts/src/gateway.ts` — View-model Zod schemas and types
+- `packages/contracts/src/events.ts` — Event type definitions
+- `packages/contracts/src/errors.ts` — Error response contract
+- `packages/contracts/src/tests/gateway-schemas.test.ts` — 11 schema validation tests
+- `docs/gateway/phase-2a-scaffold.md` — Gateway scaffold documentation
+- `scripts/check-gateway-boundaries.mjs` — Gateway boundary guard
+
+### Files Modified
+- `package.json` — Added gateway scripts and combined boundary check
+- `.github/workflows/frontend-ci.yml` — Added gateway and contracts validation jobs
+- `IMPLEMENTATION_MANIFEST.md` — Updated with Phase 2A information
+- `README.md` — Updated with Phase 2A information
+
+### Files Deleted
+- None
+
+---
+
+## Validation Results (Phase 2A)
+
+| Command | Result |
+|---|---|
+| `npm run check:boundaries` | PASS |
+| `npm run lint` (frontend) | PASS (0 errors, 0 warnings) |
+| `npm run typecheck` (frontend) | PASS |
+| `npm run test:run` (frontend) | PASS (186/186 tests) |
+| `npm run build` (frontend) | PASS |
+| `npm run check --prefix apps/gateway` | PASS (26/26 tests) |
+| `npm run check --prefix packages/contracts` | PASS (11/11 tests) |
+| Gateway local smoke | PASS (5/5 endpoints) |
+
+---
+
 ## CI Workflow
 - `.github/workflows/frontend-ci.yml`
 - Trigger: pull_request, push to main
-- Steps: `npm ci` → `lint` → `typecheck` → `test:run` → **`check:boundaries`** → `build`
-- Dependency caching via package-lock.json
+- **Frontend job**: `npm ci` → `lint` → `typecheck` → `test:run` → **`check:boundaries`** → `build`
+- **Gateway job**: `npm ci --prefix apps/gateway` → `typecheck` → `test:run` → `build`
+- **Contracts job**: `npm ci --prefix packages/contracts` → `typecheck` → `test:run`
 
-## Deferred Functionality (not implemented in Phase 1A through 1E)
-- Fastify/Express gateway integration
-- OpenCode SDK and SSE event streaming
-- WebContainer preview runtime
-- Real API requests and session creation
-- PTY / Terminal server
-- Database / SQLite persistence
-- Authentication and user sessions
-- Gemini API integration
-- Real preview runtime connections
+## Deferred Functionality (not yet implemented)
+- OpenCode SDK client creation (Phase 2B)
+- SSE/EventSource stream to browser (Phase 2B)
+- WebSocket for real-time updates (Phase 2B+)
+- `prompt_async` correlation (Phase 2B+)
+- Permission prompt execution (Phase 2B+)
+- Preview runtime management (Phase 3+)
+- Authentication (Phase 3+)
+- SQLite/database persistence (Phase 3+)
+- WebContainer (Phase 9)
+- PTY / terminal (Phase 4+)
 
 ---
 
 ## Known Issues
-- None identified in Phase 1E.
+- None identified in Phase 2A.
 
 ## Next Bounded Slice
-**Phase 2A — Gateway Repository Scaffold and Contract Tests**
+**Phase 2B — Gateway OpenCode SDK Adapter Spike Behind Disabled Flag**
 
-Do not start Phase 2A.
-
-Phase 1E remains fully frontend-only with no backend dependencies.
+Do not start Phase 2B.

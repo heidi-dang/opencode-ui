@@ -2,7 +2,7 @@
 
 **Frontend web client foundation for the OpenCode headless AI development platform.**
 
-Current phase: **Phase 1E — Readiness Audit and Gateway Integration Contract Prep**
+Current phase: **Phase 2A — Gateway Scaffold and Contract Tests**
 
 ## Implemented Routes
 
@@ -14,16 +14,26 @@ Current phase: **Phase 1E — Readiness Audit and Gateway Integration Contract P
 | `/qa` | Frontend QA sandbox — UI gallery, stress data, accessibility tests |
 | `/*` | 404 Not Found page |
 
+## Gateway Scaffold (Phase 2A)
+
+The gateway server lives at `apps/gateway/`. It is a Fastify v5 HTTP server that serves contract-demo data only. No OpenCode SDK, no SSE, no WebSocket, no database.
+
+```bash
+# Run the gateway locally
+GATEWAY_HOST=127.0.0.1 GATEWAY_PORT=3001 npm run gateway:dev
+
+# Test endpoints
+curl http://127.0.0.1:3001/health
+curl http://127.0.0.1:3001/ready
+curl http://127.0.0.1:3001/contract/status
+```
+
+Shared contracts are in `packages/contracts/` (Zod schemas + TypeScript types).
+
 ## Technology Stack
 
-- **React 19** with TypeScript
-- **Vite 6** build tool
-- **Tailwind CSS v4** styling
-- **Zustand** state management with localStorage persistence
-- **React Router v7** client-side routing
-- **Lucide React** icons
-- **Vitest** + **Testing Library** for tests
-- **ESLint** with TypeScript and React plugins
+- **Frontend**: React 19 with TypeScript, Vite 6, Tailwind CSS v4, Zustand, React Router v7, Lucide React, Vitest + Testing Library, ESLint
+- **Gateway**: Fastify v5 with TypeScript, Zod for schema validation, Vitest for tests
 
 ## Getting Started
 
@@ -31,33 +41,57 @@ Current phase: **Phase 1E — Readiness Audit and Gateway Integration Contract P
 # Install dependencies
 npm install
 
-# Start development server
+# Start frontend development server
 npm run dev
 
-# Run all validation
+# Run frontend validation
 npm run lint        # ESLint with zero-warning policy
 npm run typecheck   # TypeScript type checking
 npm run test:run    # Vitest test suite
 npm run build       # Production build (typecheck + Vite build)
+npm run check:boundaries  # Forbidden integration checks
+
+# Run gateway
+npm run gateway:install
+GATEWAY_HOST=127.0.0.1 GATEWAY_PORT=3001 npm run gateway:dev
+
+# Run gateway validation
+npm run gateway:check  # typecheck + tests + build
 ```
 
 ## Repository Structure
 
 ```
 opencode-ui/
+├── apps/
+│   └── gateway/        # Fastify gateway scaffold (Phase 2A)
+│       ├── src/
+│       │   ├── routes/       # Health and contract endpoints
+│       │   ├── middleware/   # Request ID, error handler
+│       │   └── tests/        # Gateway test suite
+│       └── package.json
+├── packages/
+│   └── contracts/      # Shared Zod schemas and types
+│       ├── src/
+│       │   ├── gateway.ts    # View-model schemas
+│       │   ├── events.ts     # Event type definitions
+│       │   └── errors.ts     # Error response contract
+│       └── package.json
 ├── src/
 │   ├── adapters/       # Demo data adapter (Phase 1E)
 │   ├── components/     # Reusable UI components
-│   ├── contracts/      # TypeScript contracts and view models
+│   ├── contracts/      # Frontend-safe view models
 │   ├── hooks/          # Custom React hooks
 │   ├── pages/          # Route page components
 │   ├── store/          # Zustand state management
-│   ├── mocks/          # Phase 1A demo/mock data
+│   ├── mocks/          # Demo/mock data
 │   ├── types/          # TypeScript type definitions
 │   └── tests/          # Vitest test suite
 ├── docs/
 │   ├── readiness/      # Frontend readiness audit
-│   └── contracts/      # Gateway integration contract docs
+│   ├── contracts/      # Gateway integration contract docs
+│   └── gateway/        # Gateway scaffold documentation
+├── scripts/            # Boundary check scripts
 ├── .github/workflows/  # CI configuration
 ├── eslint.config.js    # ESLint flat configuration
 ├── vite.config.ts      # Vite + Vitest configuration
@@ -66,15 +100,17 @@ opencode-ui/
 
 ## Deferred Functionality
 
-The following features are **not implemented** in Phase 1A through 1D:
+The following features are **not implemented** yet:
 
-- Fastify/Express gateway integration
-- OpenCode SDK and SSE event streaming
-- WebContainer preview runtime
-- Real API requests and session creation
-- PTY / Terminal server
-- Database / SQLite persistence
-- Authentication and user sessions
-- Gemini API integration
+- OpenCode SDK client creation (planned Phase 2B)
+- SSE/EventSource stream to browser (planned Phase 2B)
+- WebSocket for real-time updates (planned Phase 2B+)
+- `prompt_async` correlation (planned Phase 2B+)
+- Permission prompt execution (planned Phase 2B+)
+- Preview runtime management (planned Phase 3+)
+- Authentication (planned Phase 3+)
+- SQLite/database persistence (planned Phase 3+)
+- WebContainer preview runtime (planned Phase 9)
+- PTY / Terminal server (planned Phase 4+)
 
 See [IMPLEMENTATION_MANIFEST.md](./IMPLEMENTATION_MANIFEST.md) for the full roadmap.
