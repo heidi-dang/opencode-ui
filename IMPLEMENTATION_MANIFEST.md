@@ -8,10 +8,11 @@
 - **Slice**: 1C — Command Palette, Session UX, and Keyboard Interactions (baseline)
 - **Slice**: 1D — Accessibility Pass, Visual QA, and Layout Stress Testing (baseline)
 - **Slice**: 1E — Readiness Audit and Gateway Integration Contract Prep (baseline)
-- **Slice**: 2A — Gateway Scaffold and Contract Tests (current)
-- **Status**: Phase 2A implemented
+- **Slice**: 2A — Gateway Scaffold and Contract Tests (baseline)
+- **Slice**: 2B — Gateway OpenCode SDK Adapter Spike Behind Disabled Flag (current)
+- **Status**: Phase 2B implemented
 - **Baseline commit**: `b2a1106be0fcc751e9e886835f8e7bbe0f962bdb` (Phase 1A)
-- **Current branch**: `feat/phase-2a-gateway-scaffold`
+- **Current branch**: `feat/phase-2b-sdk-adapter-disabled`
 
 ---
 
@@ -344,7 +345,61 @@
 6. **Expanded Test Suite**:
    - 223 total tests (186 frontend + 26 gateway + 11 contracts).
    - Gateway: health, contract, config, boundary tests.
-   - Contracts: Zod schema validation tests.
+    - Contracts: Zod schema validation tests.
+
+### Phase 2B (current additions)
+1. **Gateway-Only SDK Adapter Seam** (`apps/gateway/src/opencode/`):
+   - `sdkTypes.ts` — Adapter types (`SdkAdapterState`, `SdkConfig`, `SdkHealthView`, `SdkAdapter` interface).
+   - `sdkDisabled.ts` — Disabled adapter implementation returning safe `not-enabled` state.
+   - `sdkAdapter.ts` — Factory function `createSdkAdapter({ enabled })`; returns disabled adapter even when `enabled=true` in Phase 2B.
+2. **Disabled-by-Default Config Flags**:
+   - `OPENCODE_SDK_ENABLED` (default: `false`) — SDK adapter is disabled.
+   - `OPENCODE_SERVER_URL` (default: `''`) — Must be set when enabling.
+   - `OPENCODE_DEFAULT_MODEL` (default: `''`) — Must be set when enabling.
+   - Missing optional env vars do not crash disabled mode.
+   - `SdkNotEnabledError` thrown on any init attempt while disabled.
+3. **Gateway Boundary Protection**:
+   - `scripts/check-gateway-boundaries.mjs` updated to exclude sdk-adapter test.
+   - Gateway source scan still forbids `EventSource`, `WebSocket`, `prompt_async`, `SQLite`.
+4. **Expanded Test Suite**:
+   - 239 total tests (186 frontend + 42 gateway + 11 contracts).
+   - 16 new gateway tests: disabled default, safe health, init rejection, config validation, boundary.
+   - Tests prove no SDK dependency, no EventSource, no WebSocket, no secrets in examples.
+
+---
+
+## Files Changed (Phase 2B)
+
+### Files Created
+- `apps/gateway/src/opencode/sdkTypes.ts` — SDK adapter types
+- `apps/gateway/src/opencode/sdkDisabled.ts` — Disabled adapter implementation
+- `apps/gateway/src/opencode/sdkAdapter.ts` — Adapter factory
+- `apps/gateway/src/tests/sdk-adapter.test.ts` — 16 SDK adapter tests
+- `docs/gateway/phase-2b-sdk-adapter-disabled.md` — Phase 2B documentation
+
+### Files Modified
+- `apps/gateway/src/config.ts` — Added `OPENCODE_SDK_ENABLED`, `OPENCODE_SERVER_URL`, `OPENCODE_DEFAULT_MODEL`
+- `apps/gateway/.env.example` — Added SDK env var examples
+- `apps/gateway/src/tests/boundary.test.ts` — Excluded sdk-adapter test from source scan
+- `scripts/check-gateway-boundaries.mjs` — Excluded sdk-adapter test from scan
+- `IMPLEMENTATION_MANIFEST.md` — Updated with Phase 2B information
+
+### Files Deleted
+- None
+
+---
+
+## Validation Results (Phase 2B)
+
+| Command | Result |
+|---|---|
+| `npm run check:boundaries` (frontend + gateway) | PASS |
+| `npm run lint` (frontend) | PASS |
+| `npm run typecheck` (frontend) | PASS |
+| `npm run test:run` (frontend) | PASS (186/186 tests) |
+| `npm run build` (frontend) | PASS |
+| `npm run check --prefix apps/gateway` (typecheck + 42 tests + build) | PASS |
+| `npm run check --prefix packages/contracts` (typecheck + 11 tests) | PASS |
 
 ---
 
@@ -411,11 +466,11 @@
 - **Contracts job**: `npm ci --prefix packages/contracts` → `typecheck` → `test:run`
 
 ## Deferred Functionality (not yet implemented)
-- OpenCode SDK client creation (Phase 2B)
-- SSE/EventSource stream to browser (Phase 2B)
-- WebSocket for real-time updates (Phase 2B+)
-- `prompt_async` correlation (Phase 2B+)
-- Permission prompt execution (Phase 2B+)
+- Live OpenCode SDK client connection (Phase 2C+)
+- SSE/EventSource stream to browser (Phase 2C+)
+- WebSocket for real-time updates (Phase 2C+)
+- `prompt_async` correlation (Phase 3+)
+- Permission prompt execution (Phase 3+)
 - Preview runtime management (Phase 3+)
 - Authentication (Phase 3+)
 - SQLite/database persistence (Phase 3+)
@@ -425,9 +480,9 @@
 ---
 
 ## Known Issues
-- None identified in Phase 2A.
+- None identified in Phase 2B. Phase 2B adds a disabled SDK adapter only — no live connection exists.
 
 ## Next Bounded Slice
-**Phase 2B — Gateway OpenCode SDK Adapter Spike Behind Disabled Flag**
+**Phase 2C — Gateway Runtime Config, Safe Startup, and Adapter Health**
 
-Do not start Phase 2B.
+Do not start Phase 2C. Complete and merge Phase 2B first.
