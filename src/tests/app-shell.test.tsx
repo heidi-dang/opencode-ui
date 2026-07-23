@@ -61,6 +61,13 @@ describe('Route navigation', () => {
     await userEvent.click(builderLink);
     expect(screen.getByText(/Workflow Execution Timeline/i)).toBeInTheDocument();
   });
+
+  it('renders the QA nav link in primary navigation', () => {
+    renderApp('/builder');
+    const qaLink = screen.getByRole('link', { name: /QA/i });
+    expect(qaLink).toBeInTheDocument();
+    expect(qaLink).toHaveAttribute('href', '/qa');
+  });
 });
 
 describe('Session search', () => {

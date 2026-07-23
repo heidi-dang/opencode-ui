@@ -101,6 +101,9 @@ const FORBIDDEN_IMPORTS = [
 
   // Environment variables (source code only)
   'GEMINI_API_KEY',
+
+  // HTTP client libraries
+  'axios',
 ];
 
 // ── Patterns that require an import/require context ──────────────────
@@ -117,6 +120,7 @@ const IMPORT_PATTERNS = [
   'better-sqlite3', 'sql.js', 'sqlite3',
   'next-auth', 'passport', 'auth0', 'clerk', '@supabase/supabase-js',
   'eventsource', 'event-source-polyfill',
+  'axios',
 ];
 
 // ── Patterns that are literal strings in source code ─────────────────
@@ -131,6 +135,8 @@ const LITERAL_PATTERNS = [
   { pattern: 'GEMINI_API_KEY', wordBoundary: true },
   { pattern: 'localhost:', wordBoundary: false },
   { pattern: '127.0.0.1:', wordBoundary: false },
+  // Network request patterns — catch actual function calls, not string references
+  { pattern: 'fetch(', wordBoundary: true },
 ];
 
 // ── Scan logic ──────────────────────────────────────────────────────
