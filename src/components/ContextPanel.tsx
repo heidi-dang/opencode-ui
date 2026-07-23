@@ -10,7 +10,6 @@ import {
   File,
   CheckCircle,
   Circle,
-  Inbox,
 } from 'lucide-react';
 import { useUiStore } from '../store/useUiStore';
 import { ContextSection } from '../types/ui';

@@ -1,15 +1,17 @@
 # IMPLEMENTATION MANIFEST
 
 ## Overview
-* **Project**: OpenCode Headless Web UI
-* **Phase**: 1
-* **Slice**: 1A (Production Shell and Interaction Foundation)
-* **Status**: Completed
+- **Project**: OpenCode Web UI
+- **Phase**: 1
+- **Slice**: 1A (Production Shell and Interaction Foundation)
+- **Status**: Verified baseline (repair branch)
+- **Baseline commit**: `b2a1106be0fcc751e9e886835f8e7bbe0f962bdb`
+- **Repair branch**: `fix/phase-1a-validation-baseline`
 
 ---
 
 ## Deliverables Summary
-Phase 1A delivers a production-grade, highly polished React + Vite web UI shell foundation for the OpenCode headless server.
+Phase 1A delivers a production-grade, highly polished React + Vite web UI shell foundation for the OpenCode headless server. This manifest documents the verified baseline after repository integrity, dependency hygiene, tests, documentation, and CI repair.
 
 ### Features Implemented
 1. **Three-Panel Layout**:
@@ -36,51 +38,84 @@ Phase 1A delivers a production-grade, highly polished React + Vite web UI shell 
 
 ---
 
-## File Changes & Inventory
+## Files Changed (repair branch)
 
-### Created / Updated Files
-- `metadata.json` - Updated app name and description
-- `index.html` - Set title to OpenCode Web UI
-- `src/index.css` - Defined dark theme CSS variables, scrollbars, and focus ring utilities
-- `src/types/ui.ts` - Defined types for UI state, sessions, workflow steps, messages, files, and todos
-- `src/mocks/frontendDemoData.ts` - Isolated mock data module for Phase 1A demonstration
-- `src/store/useUiStore.ts` - Zustand layout and preference store with storage persistence
-- `src/components/ErrorBoundary.tsx` - Reusable component error boundary
-- `src/components/LoadablePanel.tsx` - Panel wrapper supporting idle, loading, ready, empty, error, and degraded states
-- `src/components/ResponsiveDrawer.tsx` - Accessible mobile slide-over drawer with backdrop
-- `src/components/PrimaryNavigation.tsx` - Tab router navigation between Builder and Live Preview
-- `src/components/TopToolbar.tsx` - Main desktop header with selectors and panel controls
-- `src/components/SessionSearch.tsx` - Filter input for sessions
-- `src/components/SessionList.tsx` - Status-badged session item list
-- `src/components/SessionsPanel.tsx` - Left sidebar for session management
-- `src/components/WorkflowSummary.tsx` - Collapsible workflow execution timeline
-- `src/components/MessageFeed.tsx` - Markdown message stream with code block copy buttons
-- `src/components/ComposerPlaceholder.tsx` - Multi-line prompt composer with mention buttons
-- `src/components/ContextPanel.tsx` - Right "Workspace & Context" panel with 4 sections
-- `src/components/BuilderWorkspace.tsx` - Center column workspace container
-- `src/components/AppShell.tsx` - Responsive shell wrapper
-- `src/pages/BuilderPage.tsx` - Primary builder page route
-- `src/pages/LivePreviewEmptyState.tsx` - Intentional Phase 9 live preview empty state route
-- `src/pages/NotFoundPage.tsx` - 404 route
-- `src/App.tsx` - React Router entry point
+### Files Created
+- `.github/workflows/frontend-ci.yml` — GitHub Actions CI workflow
+- `eslint.config.js` — ESLint flat configuration
+- `tsconfig.build.json` — TypeScript build configuration for `tsc -b`
+- `src/tests/setup.ts` — Vitest test setup with jsdom and Testing Library
+- `src/tests/app-shell.test.tsx` — 17 integration tests covering routes, panels, search, appearance, persistence, and behavior
+
+### Files Modified
+- `package.json` — Corrected identity, scripts (lint, typecheck, test, build), removed unrelated deps
+- `vite.config.ts` — Added Vitest configuration (jsdom environment, setup files)
+- `tsconfig.json` — Added strict type-checking options, removed composite/noEmit conflict
+- `README.md` — Professional OpenCode Web UI README
+- `IMPLEMENTATION_MANIFEST.md` — Updated with verified baseline information
+- `.env.example` — Replaced Gemini-specific variables with Phase 1A note
+
+### Files Deleted
+- `bun.lock` — Replaced with package-lock.json (npm)
+
+### Dependencies Removed
+- `@google/genai` — Unused AI SDK dependency
+- `dotenv` — Not used in frontend-only phase
+- `express` — Backend dependency, deferred to Phase 2
+- `@types/express` — Associated type definitions
+- `tsx` — Not used in this project
+- `motion` — No imports from it in source code
+- `autoprefixer` — Not needed (Tailwind v4 handles prefixes)
+- `esbuild` — Not needed (Vite bundles its own)
+
+### Dependencies Added (dev)
+- `eslint` — Linting
+- `@eslint/js` — ESLint recommended config
+- `typescript-eslint` — TypeScript ESLint support
+- `eslint-plugin-react-hooks` — React hooks lint rules
+- `eslint-plugin-react-refresh` — React fast refresh lint rules
+- `vitest` — Test runner
+- `jsdom` — DOM environment for tests
+- `@testing-library/react` — React Testing Library
+- `@testing-library/jest-dom` — DOM matchers
+- `@testing-library/user-event` — User event simulation
+- `@vitest/coverage-v8` — Coverage reporter
 
 ---
 
-## Dependencies Added
-- `zustand`: ^5.x (UI state persistence)
-- `react-router-dom`: ^7.x (Client-side routing)
+## Validation Results
 
----
+| Command | Result |
+|---|---|
+| `npm ci` | PASS |
+| `npm run lint` (ESLint —max-warnings=0) | PASS |
+| `npm run typecheck` (tsc --noEmit) | PASS (0 errors) |
+| `npm run test:run` (vitest run) | PASS (17/17 tests) |
+| `npm run build` (tsc -b && vite build) | PASS |
 
-## Explicitly Deferred Functionality (Boundaries)
-- Fastify gateway integration
-- OpenCode SDK & SSE stream consumer
+## CI Workflow
+- `.github/workflows/frontend-ci.yml`
+- Trigger: pull_request, push to main
+- Steps: `npm ci` → `lint` → `typecheck` → `test:run` → `build`
+- Dependency caching via package-lock.json
+
+## Known Issues
+- None identified in Phase 1A baseline
+
+## Deferred Functionality (not implemented in Phase 1A)
+- Fastify/Express gateway integration
+- OpenCode SDK and SSE event streaming
 - WebContainer preview runtime
 - Real API requests and session creation
 - PTY / Terminal server
 - Database / SQLite persistence
+- Authentication and user sessions
+- Gemini API integration
+- Real preview runtime connections
 
 ---
 
 ## Next Bounded Slice
-**Phase 1B / Phase 2**: Fastify gateway setup, SSE event streaming integration, and live session creation API client connection.
+**Frontend Phase 1B — Design-System Hardening and Frontend Contract Boundaries**
+
+This slice focuses on design-system refinement, component contract enforcement, and frontend-only boundary hardening. It does **not** implement Fastify, SDK/SSE, authentication, or preview runtime.
