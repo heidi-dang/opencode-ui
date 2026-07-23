@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, Terminal } from 'lucide-react';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 
 export const NotFoundPage: React.FC = () => {
   return (

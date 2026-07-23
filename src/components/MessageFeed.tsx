@@ -12,7 +12,6 @@ import {
   Loader2,
 } from 'lucide-react';
 import { DEMO_MESSAGES } from '../mocks/frontendDemoData';
-import { DemoMessage } from '../types/ui';
 
 export const MessageFeed: React.FC = () => {
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);

@@ -1,19 +1,73 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# OpenCode Web UI
 
-# Run and deploy your AI Studio app
+**Frontend web client foundation for the OpenCode headless AI development platform.**
 
-This contains everything you need to run your app locally.
-https://ai.studio/apps/5a12b927-aa19-4543-8666-680db13af7a6
+Current phase: **Phase 1A — Frontend Shell**
 
-## Run Locally
+## Implemented Routes
 
-**Prerequisites:**  Node.js
+| Route | Description |
+|---|---|
+| `/` | Redirects to `/builder` |
+| `/builder` | Three-panel builder workspace (sessions, chat, context) |
+| `/live-preview` | Intentional empty state for preview runtime (Phase 9) |
+| `/*` | 404 Not Found page |
 
+## Technology Stack
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- **React 19** with TypeScript
+- **Vite 6** build tool
+- **Tailwind CSS v4** styling
+- **Zustand** state management with localStorage persistence
+- **React Router v7** client-side routing
+- **Lucide React** icons
+- **Vitest** + **Testing Library** for tests
+- **ESLint** with TypeScript and React plugins
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Run all validation
+npm run lint        # ESLint with zero-warning policy
+npm run typecheck   # TypeScript type checking
+npm run test:run    # Vitest test suite
+npm run build       # Production build (typecheck + Vite build)
+```
+
+## Repository Structure
+
+```
+opencode-ui/
+├── src/
+│   ├── components/     # Reusable UI components
+│   ├── pages/          # Route page components
+│   ├── store/          # Zustand state management
+│   ├── mocks/          # Phase 1A demo/mock data
+│   ├── types/          # TypeScript type definitions
+│   └── tests/          # Vitest test suite
+├── .github/workflows/  # CI configuration
+├── eslint.config.js    # ESLint flat configuration
+├── vite.config.ts      # Vite + Vitest configuration
+└── tsconfig.json       # TypeScript configuration
+```
+
+## Deferred Functionality
+
+The following features are **not implemented** in Phase 1A:
+
+- Fastify/Express gateway integration
+- OpenCode SDK and SSE event streaming
+- WebContainer preview runtime
+- Real API requests and session creation
+- PTY / Terminal server
+- Database / SQLite persistence
+- Authentication and user sessions
+- Gemini API integration
+
+See [IMPLEMENTATION_MANIFEST.md](./IMPLEMENTATION_MANIFEST.md) for the full roadmap.
