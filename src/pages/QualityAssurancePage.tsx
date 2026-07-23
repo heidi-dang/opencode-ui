@@ -11,6 +11,7 @@ import {
   SegmentedControl,
 } from '../components/ui';
 import { SESSION_STATUS_VISUALS } from '../contracts/presentation';
+import { getDemoGatewayStatus, getDemoPreviewStatus } from '../adapters/demoGatewayAdapter';
 import {
   STRESS_SESSION_TITLE,
   STRESS_WORKSPACE_NAME,
@@ -404,6 +405,64 @@ export const QualityAssurancePage: React.FC = () => {
           <p className="text-[10px] text-slate-500">
             All interactive elements have accessible names. Focus indicators use the <code className="text-amber-400">.focus-ring</code> class.
           </p>
+        </Panel>
+      </section>
+
+      {/* Gateway Integration Readiness */}
+      <section className="space-y-4">
+        <SectionHeader title="Gateway Integration Readiness" subtitle="Phase 2 preparation status" />
+
+        <Panel bodyClassName="p-4 space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3">
+              <h4 className="text-xs font-bold text-slate-200 mb-2">Connection</h4>
+              <p className="text-[10px] text-slate-400 space-y-1">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-slate-500/10 border border-slate-500/20 text-slate-400 font-mono text-[10px]">
+                  {getDemoGatewayStatus().connection}
+                </span>
+              </p>
+              <p className="text-[10px] text-slate-500 mt-2">Demo adapter — no real connection.</p>
+            </div>
+
+            <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3">
+              <h4 className="text-xs font-bold text-slate-200 mb-2">SDK Status</h4>
+              <ul className="text-[10px] text-slate-400 space-y-1">
+                <li>📦 <code className="text-amber-400">@opencode-ai/sdk</code>: <span className="text-slate-500">Not installed</span></li>
+                <li>📡 SSE: <span className="text-slate-500">Not implemented</span></li>
+                <li>🔌 WebSocket: <span className="text-slate-500">Not implemented</span></li>
+                <li>🌐 Gateway: <span className="text-slate-500">Not implemented</span></li>
+              </ul>
+            </div>
+
+            <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3">
+              <h4 className="text-xs font-bold text-slate-200 mb-2">Preview Runtime</h4>
+              <p className="text-[10px] text-slate-400">
+                State: <code className="text-slate-500">{getDemoPreviewStatus().state}</code>
+              </p>
+              <p className="text-[10px] text-slate-500 mt-1">Preview runtime management requires Phase 2 gateway.</p>
+            </div>
+
+            <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3">
+              <h4 className="text-xs font-bold text-slate-200 mb-2">Contracts</h4>
+              <ul className="text-[10px] text-slate-400 space-y-1">
+                <li>✅ View-model contracts ready</li>
+                <li>✅ Demo adapter ready</li>
+                <li>✅ Integration contract docs ready</li>
+                <li>⬜ Gateway server: <span className="text-slate-500">Phase 2</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
+            <p className="text-[10px] text-amber-400 font-medium">
+              ⚡ Phase 2 — Gateway Contract Implementation
+            </p>
+            <p className="text-[10px] text-slate-400 mt-1">
+              The next phase will scaffold a Fastify gateway server, install the OpenCode SDK,
+              implement SSE event streaming, and connect the frontend demo adapter to real data.
+              No gateway work has started in Phase 1.
+            </p>
+          </div>
         </Panel>
       </section>
     </div>

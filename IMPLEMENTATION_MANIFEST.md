@@ -6,10 +6,11 @@
 - **Slice**: 1A — Production Shell and Interaction Foundation (baseline)
 - **Slice**: 1B — Design-System Hardening and Frontend Contract Boundaries (baseline)
 - **Slice**: 1C — Command Palette, Session UX, and Keyboard Interactions (baseline)
-- **Slice**: 1D — Accessibility Pass, Visual QA, and Layout Stress Testing (current)
-- **Status**: Phase 1D implemented
+- **Slice**: 1D — Accessibility Pass, Visual QA, and Layout Stress Testing (baseline)
+- **Slice**: 1E — Readiness Audit and Gateway Integration Contract Prep (current)
+- **Status**: Phase 1E implemented
 - **Baseline commit**: `b2a1106be0fcc751e9e886835f8e7bbe0f962bdb` (Phase 1A)
-- **Current branch**: `feat/frontend-phase-1d-accessibility-visual-qa`
+- **Current branch**: `feat/frontend-phase-1e-readiness-contracts`
 
 ---
 
@@ -244,13 +245,82 @@
 
 ---
 
+### Phase 1E (current additions)
+1. **Frontend Readiness Audit** (`docs/readiness/frontend-readiness-audit.md`):
+   - Repository-backed audit of current frontend state, routes, stores, mocks, primitives, accessibility, testing, deployment.
+   - Identifies 6 known risks and 9 integration blockers.
+   - Documents gateway handoff requirements and Phase 2 prerequisites.
+   - Truthful — does not claim the gateway exists or live OpenCode sessions are active.
+2. **Gateway Integration Contract** (`docs/contracts/gateway-integration-contract.md`):
+   - Defines future frontend/gateway architecture, responsibilities, and boundaries.
+   - Covers connection lifecycle, route groups, SSE events, REST endpoints, and all view-model contracts.
+   - Documents security boundaries and forbidden browser responsibilities.
+   - Documentation only — no API calls or gateway code.
+3. **Typed View-Model Contracts** (`src/contracts/gatewayViewModels.ts`):
+   - `GatewayConnectionView`, `GatewaySessionView`, `GatewayMessageView`, `GatewayPermissionPromptView`, `GatewayPreviewStatusView`.
+   - `GatewayWorkspaceRegistryView` with workspace/branch/agent/model entries.
+   - `GatewayStatusView` aggregate status.
+   - Frontend-safe types only — no SDK imports, no raw API responses, no network calls.
+4. **Demo Adapter Seam** (`src/adapters/demoGatewayAdapter.ts`):
+   - Local synchronous adapter mapping mock data into `GatewayXxxView` models.
+   - `mapSessionToView()`, `mapAllSessionsToViews()`, `getSessionViewById()`, `mapMessageToView()`, `mapMessagesToViews()`.
+   - `getDemoPreviewStatus()`, `getDemoPermissionPrompt()`, `getDemoWorkspaceRegistry()`, `getDemoGatewayStatus()`.
+   - No network, no promises, no SDK, no fetch, no EventSource, no WebSocket.
+   - Clearly labelled demo-only with `isDemo: true`.
+5. **QA Page Gateway Readiness Section** (`src/pages/QualityAssurancePage.tsx`):
+   - "Gateway Integration Readiness" section showing: Connection (offline), SDK (not installed), SSE (not implemented), WebSocket (not implemented), Gateway (not implemented), Preview state.
+   - Contracts status: view-model contracts ready, demo adapter ready, integration docs ready.
+   - Phase 2 note: no gateway work has started.
+   - Clearly labelled as readiness information, not a live connection screen.
+6. **Boundary Guard Hardening** (`scripts/check-forbidden-integrations.mjs`):
+   - Added `XMLHttpRequest` to both `FORBIDDEN_IMPORTS` and `LITERAL_PATTERNS`.
+   - Added `docs/` to excluded directories (not scanned as runtime source).
+7. **Expanded Test Suite**:
+   - 177 total tests (153 Phase 1A-1D + 24 new Phase 1E).
+   - `gateway-contracts.test.ts` — 19 tests for view-model contracts, demo adapter, boundary verification.
+   - `readiness-docs.test.ts` — 13 tests for QA readiness section, docs content, boundary hardening.
+
+---
+
+## Files Changed (Phase 1E)
+
+### Files Created
+- `docs/readiness/frontend-readiness-audit.md` — Frontend readiness audit document
+- `docs/contracts/gateway-integration-contract.md` — Gateway integration contract document
+- `src/contracts/gatewayViewModels.ts` — Frontend-safe gateway view-model types
+- `src/adapters/demoGatewayAdapter.ts` — Local-only demo data adapter
+- `src/tests/gateway-contracts.test.ts` — 19 gateway contract and adapter tests
+- `src/tests/readiness-docs.test.ts` — 13 readiness doc and boundary tests
+
+### Files Modified
+- `src/pages/QualityAssurancePage.tsx` — Added Gateway Integration Readiness section
+- `scripts/check-forbidden-integrations.mjs` — Added XMLHttpRequest, excluded docs/
+- `IMPLEMENTATION_MANIFEST.md` — Updated with Phase 1E information
+
+### Files Deleted
+- None
+
+---
+
+## Validation Results (Phase 1E)
+
+| Command | Result |
+|---|---|
+| `npm run check:boundaries` | PASS |
+| `npm run lint` | PASS (0 errors, 0 warnings) |
+| `npm run typecheck` | PASS |
+| `npm run test:run` (vitest run) | PASS (177/177 tests, 13 files) |
+| `npm run build` (tsc -b && vite build) | PASS |
+
+---
+
 ## CI Workflow
 - `.github/workflows/frontend-ci.yml`
 - Trigger: pull_request, push to main
 - Steps: `npm ci` → `lint` → `typecheck` → `test:run` → **`check:boundaries`** → `build`
 - Dependency caching via package-lock.json
 
-## Deferred Functionality (not implemented in Phase 1A through 1D)
+## Deferred Functionality (not implemented in Phase 1A through 1E)
 - Fastify/Express gateway integration
 - OpenCode SDK and SSE event streaming
 - WebContainer preview runtime
@@ -264,11 +334,11 @@
 ---
 
 ## Known Issues
-- None identified in Phase 1D.
+- None identified in Phase 1E.
 
 ## Next Bounded Slice
-**Frontend Phase 1E — Frontend Readiness Audit and Gateway Integration Contract Prep**
+**Phase 2A — Gateway Repository Scaffold and Contract Tests**
 
-Do not start Phase 1E.
+Do not start Phase 2A.
 
-Phase 1D remains fully frontend-only with no backend dependencies.
+Phase 1E remains fully frontend-only with no backend dependencies.
