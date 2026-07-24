@@ -3,7 +3,7 @@ import { buildServer } from '../server.js';
 import { loadConfig } from '../config.js';
 
 function createTestApp() {
-  const config = loadConfig({ NODE_ENV: 'test', GATEWAY_PORT: 0 } as any);
+  const config = loadConfig({ nodeEnv: 'test', port: 3001 });
   return buildServer(config);
 }
 
@@ -18,11 +18,11 @@ describe('GET /health', () => {
     expect(body).toHaveProperty('version', '0.1.0');
   });
 
-  it('has scaffold mode', async () => {
+  it('reports safe-disabled mode by default', async () => {
     const app = createTestApp();
     const res = await app.inject({ method: 'GET', url: '/health' });
     const body = JSON.parse(res.payload);
-    expect(body).toHaveProperty('mode', 'scaffold');
+    expect(body).toHaveProperty('mode', 'safe-disabled');
   });
 });
 

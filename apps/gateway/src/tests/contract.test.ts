@@ -7,7 +7,7 @@ import {
 } from '../../../../packages/contracts/src/gateway.js';
 
 function createTestApp() {
-  const config = loadConfig({ NODE_ENV: 'test', GATEWAY_PORT: 0 } as any);
+  const config = loadConfig({ nodeEnv: 'test', port: 3001 });
   return buildServer(config);
 }
 

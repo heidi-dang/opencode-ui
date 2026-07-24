@@ -1,5 +1,5 @@
 import { describe, it, expect, afterAll } from 'vitest';
-import { loadConfig } from '../config.js';
+import { loadConfig, parseConfig, computeMode, ConfigValidationError } from '../config.js';
 
 const ORIGINAL_ENV = { ...process.env };
 
@@ -14,7 +14,7 @@ describe('loadConfig', () => {
     process.env.GATEWAY_PORT = '3001';
     process.env.NODE_ENV = 'test';
     const config = loadConfig();
-    expect(config.GATEWAY_HOST).toBe('0.0.0.0');
+    expect(config.host).toBe('0.0.0.0');
   });
 
   it('reads GATEWAY_PORT from env', () => {
@@ -22,7 +22,7 @@ describe('loadConfig', () => {
     process.env.GATEWAY_PORT = '8080';
     process.env.NODE_ENV = 'test';
     const config = loadConfig();
-    expect(config.GATEWAY_PORT).toBe(8080);
+    expect(config.port).toBe(8080);
   });
 
   it('uses defaults when env is empty', () => {
@@ -30,13 +30,27 @@ describe('loadConfig', () => {
     delete process.env.GATEWAY_PORT;
     delete process.env.NODE_ENV;
     const config = loadConfig();
-    expect(config.GATEWAY_HOST).toBe('127.0.0.1');
-    expect(config.GATEWAY_PORT).toBe(3001);
-    expect(config.NODE_ENV).toBe('development');
+    expect(config.host).toBe('127.0.0.1');
+    expect(config.port).toBe(3001);
+    expect(config.nodeEnv).toBe('development');
   });
 
   it('invalid port string rejects', () => {
     process.env.GATEWAY_PORT = 'not-a-number';
-    expect(() => loadConfig()).toThrow('Invalid GATEWAY_PORT');
+    expect(() => parseConfig()).toThrow(ConfigValidationError);
+  });
+
+  it('produces safe-disabled mode by default', () => {
+    delete process.env.GATEWAY_HOST;
+    delete process.env.GATEWAY_PORT;
+    delete process.env.NODE_ENV;
+    const config = loadConfig();
+    expect(computeMode(config)).toBe('safe-disabled');
+  });
+
+  it('supports overrides via loadConfig', () => {
+    const config = loadConfig({ nodeEnv: 'test', port: 9999 });
+    expect(config.nodeEnv).toBe('test');
+    expect(config.port).toBe(9999);
   });
 });

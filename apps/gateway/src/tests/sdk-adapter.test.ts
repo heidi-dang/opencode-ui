@@ -6,19 +6,19 @@ import { loadConfig } from '../config.js';
 describe('SDK adapter disabled by default', () => {
   it('SDK disabled by default when env not set', () => {
     const config = loadConfig();
-    expect(config.OPENCODE_SDK_ENABLED).toBe(false);
+    expect(config.opencode.sdkEnabled).toBe(false);
   });
 
   it('SDK disabled when env set to false', () => {
     process.env.OPENCODE_SDK_ENABLED = 'false';
     const config = loadConfig();
-    expect(config.OPENCODE_SDK_ENABLED).toBe(false);
+    expect(config.opencode.sdkEnabled).toBe(false);
   });
 
   it('SDK enabled when env set to true', () => {
     process.env.OPENCODE_SDK_ENABLED = 'true';
     const config = loadConfig();
-    expect(config.OPENCODE_SDK_ENABLED).toBe(true);
+    expect(config.opencode.sdkEnabled).toBe(true);
   });
 });
 
@@ -49,8 +49,8 @@ describe('Disabled SDK adapter', () => {
     await expect(adapter.destroy()).resolves.toBeUndefined();
   });
 
-  it('createSdkAdapter with enabled=true still returns disabled in Phase 2B', () => {
-    // Phase 2B: only disabled adapter exists
+  it('createSdkAdapter with enabled=true still returns disabled in Phase 2C', () => {
+    // Phase 2C: only disabled adapter exists
     const adapter = createSdkAdapter({ enabled: true });
     expect(adapter.state).toBe('not-enabled');
   });
@@ -61,16 +61,16 @@ describe('Config validation for SDK', () => {
     process.env.OPENCODE_SDK_ENABLED = 'false';
     delete process.env.OPENCODE_SERVER_URL;
     const config = loadConfig();
-    expect(config.OPENCODE_SDK_ENABLED).toBe(false);
-    expect(config.OPENCODE_SERVER_URL).toBe('');
+    expect(config.opencode.sdkEnabled).toBe(false);
+    expect(config.opencode.serverUrl).toBe('');
   });
 
   it('Missing model does not crash disabled mode', () => {
     process.env.OPENCODE_SDK_ENABLED = 'false';
     delete process.env.OPENCODE_DEFAULT_MODEL;
     const config = loadConfig();
-    expect(config.OPENCODE_SDK_ENABLED).toBe(false);
-    expect(config.OPENCODE_DEFAULT_MODEL).toBe('');
+    expect(config.opencode.sdkEnabled).toBe(false);
+    expect(config.opencode.defaultModel).toBe('');
   });
 });
 

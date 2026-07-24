@@ -139,3 +139,33 @@ export const GatewayStatusViewSchema = z.object({
   isDemo: z.boolean(),
 });
 export type GatewayStatusView = z.infer<typeof GatewayStatusViewSchema>;
+
+// ── Runtime config view model ───────────────────────────────────────
+
+export const GatewayRunModeSchema = z.enum([
+  'safe-disabled',
+  'configured-not-connected',
+  'configuration-error',
+]);
+export type GatewayRunMode = z.infer<typeof GatewayRunModeSchema>;
+
+export const GatewayRuntimeConfigViewSchema = z.object({
+  nodeEnv: z.enum(['development', 'test', 'production']),
+  sdkEnabled: z.boolean(),
+  serverConfigured: z.boolean(),
+  modelConfigured: z.boolean(),
+  mode: GatewayRunModeSchema,
+});
+export type GatewayRuntimeConfigView = z.infer<typeof GatewayRuntimeConfigViewSchema>;
+
+// ── Adapter health view model ───────────────────────────────────────
+
+export const GatewayAdapterHealthViewSchema = z.object({
+  ok: z.boolean(),
+  adapter: z.enum(['disabled', 'configured']),
+  connection: z.enum(['not-enabled', 'not-connected']),
+  sdkInstalled: z.literal(false),
+  liveRequestsEnabled: z.literal(false),
+  message: z.string(),
+});
+export type GatewayAdapterHealthView = z.infer<typeof GatewayAdapterHealthViewSchema>;
